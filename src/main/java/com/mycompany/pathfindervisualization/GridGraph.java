@@ -4,7 +4,6 @@ public class GridGraph {
     private Node[][] grid;
     private int numRows, numCols;
 
-    // Constructor
     public GridGraph(int numRows, int numCols) {
         this.numRows = numRows;
         this.numCols = numCols;
@@ -17,7 +16,7 @@ public class GridGraph {
     private void initializeGrid() {
         for (int row = 0; row < numRows; row++) {
             for (int col = 0; col < numCols; col++) {
-                grid[row][col] = new Node(row, col, true); // Assume all nodes are passable initially
+                grid[row][col] = new Node(row, col, true, false, false); // Assume all nodes are passable initially
             }
         }
     }
@@ -40,6 +39,40 @@ public class GridGraph {
     // Get the node at a specific position
     public Node getNode(int row, int col) {
         return grid[row][col];
+    }
+
+    public Node getStartNode() {
+        for (int row = 0; row < numRows; row++) {
+            for (int col = 0; col < numCols; col++) {
+                Node node = grid[row][col];
+                if (node.isStartNode) {
+                    return node;
+                }
+            }
+        }
+        return null;
+    }
+
+    public Node getEndNode() {
+        for (int row = 0; row < numRows; row++) {
+            for (int col = 0; col < numCols; col++) {
+                Node node = grid[row][col];
+                if (node.isEndNode) {
+                    return node;
+                }
+            }
+        }
+        return null;
+    }
+
+    public void setStartNode(int row, int col) {
+        Node startNode = grid[row][col];
+        startNode.isStartNode = true;
+    }
+
+    public void setEndNode(int row, int col) {
+        Node endNode = grid[row][col];
+        endNode.isEndNode = true;
     }
 
     // Print the grid and neighbors (for debugging)
