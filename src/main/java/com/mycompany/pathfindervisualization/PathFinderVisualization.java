@@ -1,6 +1,8 @@
 package com.mycompany.pathfindervisualization;
 
 import javax.swing.*;
+import javax.swing.border.EmptyBorder;
+
 import java.awt.*;
 
 public class PathFinderVisualization {
@@ -121,8 +123,6 @@ public class PathFinderVisualization {
         int screenWidth = 1300;
         int screenHeight = 800;
 
-
-        
         Color settingsPanelBkg =  Color.BLUE;
         Color gridPanelBkg = Color.GREEN;
         int settingsPanelWidth = 200;
@@ -140,19 +140,29 @@ public class PathFinderVisualization {
         settingsPanel.setLayout(new BoxLayout(settingsPanel, BoxLayout.Y_AXIS));
         settingsPanel.setBackground(settingsPanelBkg);
         settingsPanel.setPreferredSize(new Dimension(settingsPanelWidth, screenHeight));
+
         
         //          ADDING COMPONENTS TO SETTINGS PANEL
+
+
+        // ALGORITHMS
         JPanel algorithmsPanel = new JPanel();
         algorithmsPanel.setMaximumSize(new Dimension(settingsPanelWidth, 200));
-
+        algorithmsPanel.setLayout(new FlowLayout());
         algorithmsPanel.add(new JLabel("Algorithm Options:"));
         String[] algorithms = {"A*", "Dijkstra", "BFS", "DFS"};
-        JComboBox<String> algorithmComboBox = new JComboBox<>(algorithms);
-        algorithmsPanel.add(algorithmComboBox);
+
+        JList<String> algorithmList = new JList<>(algorithms);
+        algorithmList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION); // For single selection
+        algorithmList.setSelectedIndex(0); // Default selection: "A*"
+
+        JScrollPane scrollPane = new JScrollPane(algorithmList);
+        scrollPane.setPreferredSize(new Dimension(180, 160));
+        algorithmsPanel.add(scrollPane);
 
         algorithmsPanel.setBackground(Color.CYAN);
-        
-        //add to settings
+
+        // add to settings 
         settingsPanel.add(algorithmsPanel);
 
 
@@ -181,6 +191,7 @@ public class PathFinderVisualization {
         startNodePanel.add(new JLabel("Start Node Coordinates"));
 
         JPanel startNodeIput = new JPanel();
+        startNodeIput.setSize(new Dimension(settingsPanelWidth-10, 20));
         JTextField xCoord = new JTextField(5); // 5 columns wide
         JTextField yCoord = new JTextField(5);
 
@@ -197,7 +208,7 @@ public class PathFinderVisualization {
 
         // set start node button
         JButton confirmStartNode = new JButton();
-        confirmStartNode.add(new JLabel("Set Start Coord"));
+        confirmStartNode.add(new JLabel("Set Start Coordinates"));
         confirmStartNode.addActionListener(l -> {
             try{
                 int x = Integer.parseInt(xCoord.getText().trim());
