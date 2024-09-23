@@ -1,7 +1,7 @@
 package com.mycompany.pathfindervisualization;
 
 import javax.swing.*;
-import javax.swing.border.EmptyBorder;
+import javax.swing.border.Border;
 
 import java.awt.*;
 
@@ -13,115 +13,6 @@ public class PathFinderVisualization {
     private int gridSize = 50;
 
     PathFinderVisualization() {
-        // initialize the grid graph
-        graph = new GridGraph(3, 3);
-
-        // Create the GUI on the event dispatching thread
-        JFrame frame = new JFrame("Path Finder Visualization");
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setSize(screenWidth, screenHeight);
-
-
-        /*
-         * Create the settings panel on the left side of the frame  
-         */
-        JPanel settingsPanel = new JPanel();
-        settingsPanel.setLayout(new BoxLayout(settingsPanel, BoxLayout.Y_AXIS));
-        settingsPanel.setBackground(Color.decode("#D9D9D9"));
-        settingsPanel.setPreferredSize(new Dimension(200, screenHeight)); // Set width to 200, height to match frame
-
-        // Add components to the settings panel
-        settingsPanel.add(new JLabel("Algorithm Options:"));
-        String[] algorithms = {"A*", "Dijkstra", "BFS", "DFS"};
-        JComboBox<String> algorithmComboBox = new JComboBox<>(algorithms);
-        settingsPanel.add(algorithmComboBox);
-
-
-        // time took for the algorithm to run
-        float timeTook = 0;
-        settingsPanel.add(new JLabel("Time Took: "+timeTook+" ms"));
-
-
-        //settingsPanel.add(Box.createRigidArea(new Dimension(0, 20))); // Add space between components
-
-        // Start node button
-        settingsPanel.add(new JLabel("Start Node:"));
-        JCheckBox startNodeField = new JCheckBox();
-        settingsPanel.add(startNodeField);
-
-
-        // End node button
-        settingsPanel.add(new JLabel("End Node:"));
-        JCheckBox endNodeField = new JCheckBox();
-        settingsPanel.add(endNodeField);
-
-        // Run button
-        JButton runButton = new JButton("Run");
-        settingsPanel.add(runButton);
-
-        // when run button is clicked run the selected algorithm 
-        runButton.addActionListener(l -> {
-            String selectedAlgorithm = algorithmComboBox.getSelectedItem().toString();
-            runAlgorithm(selectedAlgorithm);
-        });
-
-
-        // pause visualizer
-        JButton pauseButton = new JButton("Pause");
-        settingsPanel.add(pauseButton);
-
-        // when pause button is clicked
-        pauseButton.addActionListener(l -> {
-            System.out.println("Pause button clicked");
-        });
-        
-
-        //reset the grid board
-        JButton resetButton = new JButton("Reset");
-        settingsPanel.add(resetButton);
-
-        // when reset button is clicked
-        resetButton.addActionListener(l -> {
-            System.out.println("Reset button clicked");
-        });
-
-
-
-        // add panel to left side
-        frame.add(settingsPanel, BorderLayout.WEST);
-
-
-
-        /*
-         * Create the grid panel on the right side of the frame
-         */
-        JPanel gridPanel = new JPanel();
-        gridPanel.setLayout(new GridLayout(gridSize, gridSize)); // 10x10 grid
-        // Add squares to the grid panel
-        for (int i = 0; i < gridSize*gridSize; i++) {
-            JPanel square = new JPanel();
-            square.setBorder(BorderFactory.createLineBorder(Color.BLACK, 1)); // Set thin border
-            gridPanel.add(square);
-        }
-
-        // Add grid panel to the right side of the frame
-        frame.add(gridPanel, BorderLayout.CENTER);
-
-        frame.setResizable(false);
-        frame.setVisible(true);
-    }
-
-    public static void main(String[] args) {
-        //new PathFinderVisualization();
-        CreateProgram();
-        
-        
-        
-    }
-    
-    public static void CreateProgram(){
-        int screenWidth = 1300;
-        int screenHeight = 800;
 
         Color settingsPanelBkg =  Color.BLUE;
         Color gridPanelBkg = Color.GREEN;
@@ -133,8 +24,9 @@ public class PathFinderVisualization {
         frame.setSize(screenWidth, screenHeight);
         //colors the frame, testing purposes
         frame.getContentPane().setBackground(Color.RED);
+        frame.setLayout(new BorderLayout());
         
-        /**************************************/
+        /**********************************************************************************************************************/
         /*          ADD SETTINGS PANEL        */
         JPanel settingsPanel = new JPanel();
         settingsPanel.setLayout(new BoxLayout(settingsPanel, BoxLayout.Y_AXIS));
@@ -162,9 +54,6 @@ public class PathFinderVisualization {
 
         algorithmsPanel.setBackground(Color.CYAN);
 
-        // add to settings 
-        settingsPanel.add(algorithmsPanel);
-
 
 
 
@@ -179,27 +68,24 @@ public class PathFinderVisualization {
         timeTookPanel.add(timeVariable);
         timeTookPanel.setMaximumSize(new Dimension(settingsPanelWidth, 50));
 
-        //add to settings
-        settingsPanel.add(timeTookPanel);
-
 
 
 
         // START NODE
         JPanel startNodePanel = new JPanel();
         startNodePanel.setLayout(new FlowLayout());
-        startNodePanel.add(new JLabel("Start Node Coordinates"));
+        startNodePanel.add(new JLabel("Start Coordinates"));
 
         JPanel startNodeIput = new JPanel();
         startNodeIput.setSize(new Dimension(settingsPanelWidth-10, 20));
-        JTextField xCoord = new JTextField(5); // 5 columns wide
-        JTextField yCoord = new JTextField(5);
+        JTextField StartXCoord = new JTextField(5); // 5 columns wide
+        JTextField StartYCoord = new JTextField(5);
 
         // START NODE INPUT
         startNodeIput.add(new JLabel("["));
-        startNodeIput.add(xCoord);
+        startNodeIput.add(StartXCoord);
         startNodeIput.add(new JLabel(","));
-        startNodeIput.add(yCoord);
+        startNodeIput.add(StartYCoord);
         startNodeIput.add(new JLabel("]"));
 
         startNodePanel.setMaximumSize(new Dimension(settingsPanelWidth, 100));
@@ -211,103 +97,178 @@ public class PathFinderVisualization {
         confirmStartNode.add(new JLabel("Set Start Coordinates"));
         confirmStartNode.addActionListener(l -> {
             try{
-                int x = Integer.parseInt(xCoord.getText().trim());
-                int y = Integer.parseInt(yCoord.getText().trim());
+                int x = Integer.parseInt(StartXCoord.getText().trim());
+                int y = Integer.parseInt(StartYCoord.getText().trim());
 
                 StartNodeMethod(x,y);
             }
             catch(NumberFormatException e){
-                JOptionPane.showMessageDialog(null, "Invalid number set for start node", "Error", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(null, "Invalid number(s) set for start coordinates", "Error", JOptionPane.ERROR_MESSAGE);
                 System.out.println("Not valid number inputted");
             }
 
         });
         startNodePanel.add(confirmStartNode);
 
-        //add to settings
-        settingsPanel.add(startNodePanel);
 
 
-        /* 
 
 
-        // End node button
-        settingsPanel.add(new JLabel("End Node:"));
-        JCheckBox endNodeField = new JCheckBox();
-        settingsPanel.add(endNodeField);
+        // END NODE
+        JPanel endNodePanel = new JPanel();
+        endNodePanel.setLayout(new FlowLayout());
+        endNodePanel.add(new JLabel("Target Coordinates"));
 
-        // Run button
+        JPanel endNodeInput = new JPanel();
+        endNodeInput.setSize(new Dimension(settingsPanelWidth-10, 20));
+        JTextField EndXCoord = new JTextField(5); // 5 columns wide
+        JTextField EndYCoord = new JTextField(5);
+
+        // END NODE INPUT 
+        endNodeInput.add(new JLabel("["));
+        endNodeInput.add(EndXCoord);
+        endNodeInput.add(new JLabel(","));
+        endNodeInput.add(EndYCoord);
+        endNodeInput.add(new JLabel("]"));
+
+        endNodePanel.setMaximumSize(new Dimension(settingsPanelWidth, 100));
+        endNodePanel.add(endNodeInput);
+
+        // set start node button
+        JButton confirmEndNode = new JButton();
+        confirmEndNode.add(new JLabel("Set Target Coordinates"));
+        confirmEndNode.addActionListener(l -> {
+            try{
+                int x = Integer.parseInt(EndXCoord.getText().trim());
+                int y = Integer.parseInt(EndYCoord.getText().trim());
+
+                EndNodeMethod(x,y);
+            }
+            catch(NumberFormatException e){
+                JOptionPane.showMessageDialog(null, "Invalid number(s) set for target coordinates", "Error", JOptionPane.ERROR_MESSAGE);
+                System.out.println("Not valid number inputted");
+            }
+
+        });
+        endNodePanel.add(confirmEndNode);
+
+
+
+
+        // ACTION BUTTONS (RUN, PAUSE, RESET)
+        JPanel actionButtons = new JPanel();
+        actionButtons.setLayout(new FlowLayout(FlowLayout.CENTER, 10, 10));
+        actionButtons.setMaximumSize(new Dimension(settingsPanelWidth, 100));
+
+
+        // run button
         JButton runButton = new JButton("Run");
-        settingsPanel.add(runButton);
-
         // when run button is clicked run the selected algorithm 
         runButton.addActionListener(l -> {
-            String selectedAlgorithm = algorithmComboBox.getSelectedItem().toString();
+            String selectedAlgorithm = algorithmList.getSelectedValue();
             runAlgorithm(selectedAlgorithm);
         });
 
-
-        // pause visualizer
+        // pause button
         JButton pauseButton = new JButton("Pause");
-        settingsPanel.add(pauseButton);
-
         // when pause button is clicked
         pauseButton.addActionListener(l -> {
             System.out.println("Pause button clicked");
         });
         
-
-        //reset the grid board
+        //reset the grid
         JButton resetButton = new JButton("Reset");
-        settingsPanel.add(resetButton);
-
         // when reset button is clicked
         resetButton.addActionListener(l -> {
             System.out.println("Reset button clicked");
         });
 
-
-
-        // add panel to left side
-        frame.add(settingsPanel, BorderLayout.WEST);
-
-
-        JPanel gridPanel = new JPanel();
-        gridPanel.setLayout(new GridLayout(gridSize, gridSize)); // 10x10 grid
-        // Add squares to the grid panel
-        for (int i = 0; i < gridSize*gridSize; i++) {
-            JPanel square = new JPanel();
-            square.setBorder(BorderFactory.createLineBorder(Color.BLACK, 1)); // Set thin border
-            gridPanel.add(square);
-        }
+        // add buttons to panel
+        actionButtons.setBackground(Color.CYAN);
+        actionButtons.add(runButton);
+        actionButtons.add(pauseButton);
+        actionButtons.add(resetButton);
 
 
 
-        */
+        // INFORMATION LABEL 
+        JPanel informationTextPanel = new JPanel();
+        informationTextPanel.setLayout(new BorderLayout());
+        JLabel statusLabel = new JLabel();
+        statusLabel.setText("Selected Algorithm... A*");
+        informationTextPanel.setMaximumSize(new Dimension(settingsPanelWidth, 100));
+
+        statusLabel.setHorizontalAlignment(SwingConstants.LEFT);
+        informationTextPanel.add(statusLabel, BorderLayout.SOUTH);
+
+        // Add ListSelectionListener to update the statusLabel when an item is selected
+        algorithmList.addListSelectionListener(e -> {
+            if (!e.getValueIsAdjusting()) { // Ensure it only updates on final selection
+                String selectedAlgorithm = algorithmList.getSelectedValue();
+                if (selectedAlgorithm != null) {
+                    statusLabel.setText("Selected Algorithm... " + selectedAlgorithm);
+                }
+            }
+        });
 
 
 
+
+        /*      ADD COMPONENTS TO SETTINGS PANEL     */
+        settingsPanel.add(algorithmsPanel);
+        settingsPanel.add(Box.createVerticalStrut(20));
+        settingsPanel.add(startNodePanel);
+        settingsPanel.add(Box.createVerticalStrut(20));
+        settingsPanel.add(endNodePanel);
+        settingsPanel.add(Box.createVerticalStrut(20));
+        settingsPanel.add(actionButtons);
+        settingsPanel.add(Box.createVerticalStrut(20));
+        settingsPanel.add(timeTookPanel);
+        settingsPanel.add(Box.createVerticalStrut(20));
+        settingsPanel.add(informationTextPanel);
 
         
         
         
-        /**********************************/
+        /**********************************************************************************************************************/
         /*          ADD GRID PANEL        */
+
+        gridSize = 20;
+
+
         JPanel gridPanel = new JPanel();
-        //gridPanel.setLayout(new BoxLayout(gridPanel, BoxLayout.Y_AXIS));
         gridPanel.setBackground(gridPanelBkg);
         gridPanel.setPreferredSize(new Dimension(gridPanelWidth, screenHeight));
-        
-        
+        gridPanel.setLayout(new GridLayout(gridSize, gridSize,0,0)); // 10x10 grid
 
+        // Add squares to the grid panel
+        for (int i = 0; i < gridSize*gridSize; i++) {
+            JPanel cell = new JPanel();
+            cell.setLayout(new BorderLayout());
+            int[] coordinates = getRelativeCoordinates(i, gridSize); 
+            cell.add(new JLabel(coordinates[0]+","+coordinates[1]), BorderLayout.NORTH);
+
+            cell.setBorder(BorderFactory.createLineBorder(Color.BLACK)); // Add border to distinguish cells
+            cell.setBackground(Color.white); // Set cell background color
+            cell.setPreferredSize(new Dimension(10, 10));
+            gridPanel.add(cell); // Add cell to the grid
+
+        }
         
         
         
         /*          ADD MAIN PANELS TO FRAME        */
         frame.add(settingsPanel, BorderLayout.WEST);
-        frame.add(gridPanel, BorderLayout.EAST);
+        frame.add(gridPanel, BorderLayout.CENTER);
         frame.setResizable(false);
         frame.setVisible(true);
+        frame.setLocationRelativeTo(null);
+
+    }
+
+    public static void main(String[] args) {
+        new PathFinderVisualization();
+        
     }
 
     // Static method to run the selected algorithm
@@ -316,7 +277,18 @@ public class PathFinderVisualization {
         System.out.println("Running " + algorithm);
     }
 
-    private static void StartNodeMethod(int x, int y){
+    private void StartNodeMethod(int x, int y){
         System.out.println("Start Node coordinate :: "+x+", "+y);
     }
+
+    private void EndNodeMethod(int x, int y){
+        System.out.println("End Node coordinate :: "+x+", "+y);
+    }
+
+    private int[] getRelativeCoordinates(int cellIndex, int gridSize){
+        int row = cellIndex / gridSize;
+        int col = cellIndex % gridSize;
+        return new int[]{row, col}; 
+    }
+
 }
