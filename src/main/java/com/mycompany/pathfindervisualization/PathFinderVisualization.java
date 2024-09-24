@@ -1,9 +1,28 @@
 package com.mycompany.pathfindervisualization;
 
-import javax.swing.*;
-import javax.swing.border.Border;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.FlowLayout;
+import java.awt.GridLayout;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 
-import java.awt.*;
+import javax.swing.BorderFactory;
+import javax.swing.Box;
+import javax.swing.BoxLayout;
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JList;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTextField;
+import javax.swing.ListSelectionModel;
+import javax.swing.SwingConstants;
+
 
 public class PathFinderVisualization {
 
@@ -70,7 +89,27 @@ public class PathFinderVisualization {
 
 
 
+        /*
+        WILL NEED TO CONFIGURE THIS, NOW THAT GRID CELL WORKS WITH ONCLICK, 
 
+        SETTINGS PANEL NEEDS HAVE OPTIONS ONLY FOR
+        ALGORITHM PICKED
+        SPEED OF VISUALIZATION
+        CLEAR BOARD
+        RUN, PAUSE ALGORITHM
+
+
+        FOR START AND TARGET NODES
+        WE WILL HAVE DEFAULT CELLS ALREADY SELECTED 
+
+        START COORD/TARGET COORD:
+        KEEP THE SAME INPUT AND BUTTON LAYOUT,
+        EXCEPTS ITS PREFILLED WITH DEFAULT COORD
+        USER CAN CHANGE ITS COORD BY CHANGING THE INPUT
+
+        (MIGHT SEE IF USER CAN DRAG THE CELL, MIGHT BE TOO MUCH FOR NOW)
+
+         */
         // START NODE
         JPanel startNodePanel = new JPanel();
         startNodePanel.setLayout(new FlowLayout());
@@ -232,10 +271,6 @@ public class PathFinderVisualization {
         
         /**********************************************************************************************************************/
         /*          ADD GRID PANEL        */
-
-        gridSize = 20;
-
-
         JPanel gridPanel = new JPanel();
         gridPanel.setBackground(gridPanelBkg);
         gridPanel.setPreferredSize(new Dimension(gridPanelWidth, screenHeight));
@@ -244,13 +279,18 @@ public class PathFinderVisualization {
         // Add squares to the grid panel
         for (int i = 0; i < gridSize*gridSize; i++) {
             JPanel cell = new JPanel();
+
+            //add coordinates to cell
             cell.setLayout(new BorderLayout());
             int[] coordinates = getRelativeCoordinates(i, gridSize); 
-            cell.add(new JLabel(coordinates[0]+","+coordinates[1]), BorderLayout.NORTH);
+            //cell.add(new JLabel(coordinates[0]+","+coordinates[1]), BorderLayout.NORTH);
 
             cell.setBorder(BorderFactory.createLineBorder(Color.BLACK)); // Add border to distinguish cells
             cell.setBackground(Color.white); // Set cell background color
             cell.setPreferredSize(new Dimension(10, 10));
+
+            cell.addMouseListener(createMouseAdapter(i, gridPanel, gridSize));
+
             gridPanel.add(cell); // Add cell to the grid
 
         }
@@ -270,6 +310,42 @@ public class PathFinderVisualization {
         new PathFinderVisualization();
         
     }
+
+    // Extracted method to handle mouse click on a cell
+    private MouseAdapter createMouseAdapter(int cellIndex, JPanel gridPanel, int gridSize) {
+        return new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                int[] coordinates = getRelativeCoordinates(cellIndex, gridSize);
+                System.out.println("Cell "+coordinates[0]+","+coordinates[1]);
+                gridPanel.getComponent(cellIndex).setBackground(Color.GREEN);
+
+                /*
+                //GETTING THE CELLS AROUND THE CELL
+                //BUG: X+-1 OR Y+-1 COULD BE OUT OF RANGE
+                Component cellLeft = getComponentAt(coordinates[0], coordinates[1]-1, gridPanel, gridSize);
+                Component cellRight = getComponentAt(coordinates[0], coordinates[1]+1, gridPanel, gridSize);
+                Component cellUp = getComponentAt(coordinates[0]+1, coordinates[1], gridPanel, gridSize);
+                Component cellDown = getComponentAt(coordinates[0]-1, coordinates[1], gridPanel, gridSize);
+
+                cellLeft.setBackground(Color.RED);
+                cellRight.setBackground(Color.RED);
+                cellUp.setBackground(Color.RED);
+                cellDown.setBackground(Color.RED);
+                 */
+
+            }
+        };
+    }
+
+
+    // Method to get the component at (x, y) in the grid
+    private Component getComponentAt(int x, int y, JPanel gridPanel, int gridSize) {
+        int index = (x * gridSize) + y;
+
+        return gridPanel.getComponent(index);
+    }
+
 
     // Static method to run the selected algorithm
     private void runAlgorithm(String algorithm) {
