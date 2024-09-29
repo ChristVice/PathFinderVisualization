@@ -4,6 +4,11 @@ public class GridGraph {
     private Node[][] grid;
     private int numRows, numCols;
 
+    private boolean isStartNodeAlreadySet = false;
+    private Node startNodeHolder;
+    private boolean isEndNodeAlreadySet = false;
+    private Node endNodeHolder;
+
     public GridGraph(int numRows, int numCols) {
         this.numRows = numRows;
         this.numCols = numCols;
@@ -65,14 +70,33 @@ public class GridGraph {
         return null;
     }
 
+
+    // POTENTIAL LOGIC ERRO OF NOT BEING ABLE TO CHANGE START NODE AFTER FIRST TIME
     public void setStartNode(int row, int col) {
-        Node startNode = grid[row][col];
-        startNode.isStartNode = true;
+        if(!isStartNodeAlreadySet){
+            Node startNode = grid[row][col];
+            startNode.isStartNode = true;
+            startNodeHolder = startNode;
+            isStartNodeAlreadySet = true;
+        }
+        else{
+            System.out.println("Start node has already been set at :: "+startNodeHolder.toString());
+        }
+
+
     }
 
+    // POTENTIAL LOGIC ERRO OF NOT BEING ABLE TO CHANGE END NODE AFTER FIRST TIME
     public void setEndNode(int row, int col) {
-        Node endNode = grid[row][col];
-        endNode.isEndNode = true;
+        if(!isEndNodeAlreadySet){
+            Node endNode = grid[row][col];
+            endNode.isEndNode = true;
+            endNodeHolder = endNode;
+            isEndNodeAlreadySet = true;
+        }
+        else{
+            System.out.println("End node has already been set at :: "+endNodeHolder.toString());
+        }
     }
 
     // Print the grid and neighbors (for debugging)

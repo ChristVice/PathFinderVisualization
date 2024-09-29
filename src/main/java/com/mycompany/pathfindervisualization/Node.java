@@ -29,17 +29,21 @@ public class Node {
         this.isEndNode = isEndNode;
     }
 
-    public boolean getStartNode(boolean isStartNode) {
+    public boolean getStartNode() {
         return this.isStartNode;
     }
 
-    public boolean getEndNode(boolean isEndNode) {
+    public boolean getEndNode() {
         return this.isEndNode;
     }
 
     // Add a neighboring node
     public void addNeighbor(Node neighbor) {
         neighbors.add(neighbor);
+    }
+
+    public int[] getCoordinates(){
+        return new int[]{row, col};
     }
 
     // Override toString for easy debugging

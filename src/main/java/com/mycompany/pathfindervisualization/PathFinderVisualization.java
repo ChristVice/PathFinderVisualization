@@ -29,7 +29,9 @@ public class PathFinderVisualization {
     private GridGraph graph;
     private int screenWidth = 1300;
     private int screenHeight = 800;
-    private int gridSize = 50;
+    private int gridSize = 5;
+    private int[] defaultStartNode = {0,1}; 
+    private int[] defaultEndNode = {4,3}; 
 
     PathFinderVisualization() {
 
@@ -271,28 +273,44 @@ public class PathFinderVisualization {
         
         /**********************************************************************************************************************/
         /*          ADD GRID PANEL        */
+        GridGraph gridGraph = new GridGraph(gridSize, gridSize);
+        gridGraph.printGrid();
+        gridGraph.setStartNode(defaultStartNode[0], defaultStartNode[1]);
+        gridGraph.setEndNode(defaultEndNode[0], defaultEndNode[1]);
+
         JPanel gridPanel = new JPanel();
         gridPanel.setBackground(gridPanelBkg);
         gridPanel.setPreferredSize(new Dimension(gridPanelWidth, screenHeight));
         gridPanel.setLayout(new GridLayout(gridSize, gridSize,0,0)); // 10x10 grid
 
         // Add squares to the grid panel
-        for (int i = 0; i < gridSize*gridSize; i++) {
+        for (int i = 0; i < gridSize*gridSize; ++i) {
             JPanel cell = new JPanel();
 
-            //add coordinates to cell
             cell.setLayout(new BorderLayout());
+            cell.setBackground(Color.white); // Set cell background color
+
+            //add coordinates to cell
             int[] coordinates = getRelativeCoordinates(i, gridSize); 
-            //cell.add(new JLabel(coordinates[0]+","+coordinates[1]), BorderLayout.NORTH);
+            cell.add(new JLabel(coordinates[0]+","+coordinates[1]), BorderLayout.NORTH);
+
+
+            Node currentNode = gridGraph.getNode(coordinates[0], coordinates[1]);
+            if(currentNode.getStartNode()){
+                cell.setBackground(Color.GREEN);
+            }
+            if(currentNode.getEndNode()){
+                cell.setBackground(Color.magenta);
+            }
+
 
             cell.setBorder(BorderFactory.createLineBorder(Color.BLACK)); // Add border to distinguish cells
-            cell.setBackground(Color.white); // Set cell background color
             cell.setPreferredSize(new Dimension(10, 10));
 
-            cell.addMouseListener(createMouseAdapter(i, gridPanel, gridSize));
+            // when user clicks on cell
+            cell.addMouseListener(createMouseAdapter(i, gridPanel, gridSize, gridGraph));
 
             gridPanel.add(cell); // Add cell to the grid
-
         }
         
         
@@ -312,12 +330,14 @@ public class PathFinderVisualization {
     }
 
     // Extracted method to handle mouse click on a cell
-    private MouseAdapter createMouseAdapter(int cellIndex, JPanel gridPanel, int gridSize) {
+    private MouseAdapter createMouseAdapter(int cellIndex, JPanel gridPanel, int gridSize, GridGraph gridGraph) {
         return new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
                 int[] coordinates = getRelativeCoordinates(cellIndex, gridSize);
                 System.out.println("Cell "+coordinates[0]+","+coordinates[1]);
+
+
                 gridPanel.getComponent(cellIndex).setBackground(Color.GREEN);
 
                 /*
