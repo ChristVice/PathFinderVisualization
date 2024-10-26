@@ -29,11 +29,11 @@ public class Node {
         this.isEndNode = isEndNode;
     }
 
-    public boolean getStartNode() {
+    public boolean isStartNode() {
         return this.isStartNode;
     }
 
-    public boolean getEndNode() {
+    public boolean isEndNode() {
         return this.isEndNode;
     }
 

@@ -35,8 +35,12 @@ public class PathFinderVisualization {
 
     PathFinderVisualization() {
 
+        //HOLDS ALL THE COLORS USED
         Color settingsPanelBkg =  Color.BLUE;
         Color gridPanelBkg = Color.GREEN;
+        Color startNodeColor = Color.green;// new Color(0x000000);
+        Color endNodeColor = Color.magenta;//new Color(0x000000);
+
         int settingsPanelWidth = 200;
         int gridPanelWidth = screenWidth-settingsPanelWidth-1;
 
@@ -117,6 +121,12 @@ public class PathFinderVisualization {
         startNodePanel.setLayout(new FlowLayout());
         startNodePanel.add(new JLabel("Start Coordinates"));
 
+        //LITTLE ICON TO SHOW ITS COLOR
+        JPanel startNodeIcon = new JPanel();
+        startNodeIcon.setBackground(startNodeColor);
+        startNodeIcon.setSize(30, 30);
+        startNodePanel.add(startNodeIcon);
+
         JPanel startNodeIput = new JPanel();
         startNodeIput.setSize(new Dimension(settingsPanelWidth-10, 20));
         JTextField StartXCoord = new JTextField(5); // 5 columns wide
@@ -159,6 +169,12 @@ public class PathFinderVisualization {
         JPanel endNodePanel = new JPanel();
         endNodePanel.setLayout(new FlowLayout());
         endNodePanel.add(new JLabel("Target Coordinates"));
+
+        //LITTLE ICON TO SHOW ITS COLOR
+        JPanel endNodeIcon = new JPanel();
+        endNodeIcon.setBackground(endNodeColor);
+        endNodeIcon.setSize(30, 30);
+        endNodePanel.add(endNodeIcon);
 
         JPanel endNodeInput = new JPanel();
         endNodeInput.setSize(new Dimension(settingsPanelWidth-10, 20));
@@ -278,6 +294,7 @@ public class PathFinderVisualization {
         gridGraph.setStartNode(defaultStartNode[0], defaultStartNode[1]);
         gridGraph.setEndNode(defaultEndNode[0], defaultEndNode[1]);
 
+
         JPanel gridPanel = new JPanel();
         gridPanel.setBackground(gridPanelBkg);
         gridPanel.setPreferredSize(new Dimension(gridPanelWidth, screenHeight));
@@ -296,11 +313,11 @@ public class PathFinderVisualization {
 
 
             Node currentNode = gridGraph.getNode(coordinates[0], coordinates[1]);
-            if(currentNode.getStartNode()){
-                cell.setBackground(Color.GREEN);
+            if(currentNode.isStartNode()){
+                cell.setBackground(startNodeColor);
             }
-            if(currentNode.getEndNode()){
-                cell.setBackground(Color.magenta);
+            if(currentNode.isEndNode()){
+                cell.setBackground(endNodeColor);
             }
 
 
@@ -358,7 +375,6 @@ public class PathFinderVisualization {
         };
     }
 
-
     // Method to get the component at (x, y) in the grid
     private Component getComponentAt(int x, int y, JPanel gridPanel, int gridSize) {
         int index = (x * gridSize) + y;
@@ -371,6 +387,10 @@ public class PathFinderVisualization {
     private void runAlgorithm(String algorithm) {
         // Run the selected algorithm
         System.out.println("Running " + algorithm);
+
+
+        // WHEN RUN IS CLICKED, TRY TO MAKE BOXES GO DOWN 3 SLOWLY
+        
     }
 
     private void StartNodeMethod(int x, int y){
