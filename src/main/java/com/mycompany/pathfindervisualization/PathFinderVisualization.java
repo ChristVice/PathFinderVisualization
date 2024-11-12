@@ -33,7 +33,7 @@ public class PathFinderVisualization {
     private int screenHeight = 800;
     private int settingsPanelWidth = 200;
     private int gridPanelWidth = screenWidth-settingsPanelWidth-1;
-    private int gridSize = 4;
+    private int gridSize = 25;
 
     private JLabel statusLabel = new JLabel();
 
@@ -417,13 +417,7 @@ public class PathFinderVisualization {
 
                     // Color the cell to visualize BFS in progress
                     Component cell = getComponentAt(neighbor.row, neighbor.col);
-
-                    try { 
-                        cell.setBackground(visitedColor);
-                        Thread.sleep(100); 
-                    } catch (InterruptedException e) { 
-                        e.printStackTrace(); 
-                    }
+                    cell.setBackground(visitedColor);
 
                 }
             }
@@ -456,13 +450,7 @@ public class PathFinderVisualization {
 
                     // Color the cell to visualize DFS in progress
                     Component cell = getComponentAt(neighbor.row, neighbor.col);
-
-                    try { 
-                        cell.setBackground(visitedColor); // Change to your preferred color
-                        Thread.sleep(100); 
-                    } catch (InterruptedException e) { 
-                        e.printStackTrace(); 
-                    }
+                    cell.setBackground(visitedColor); // Change to your preferred color
                 }
             }
         }
