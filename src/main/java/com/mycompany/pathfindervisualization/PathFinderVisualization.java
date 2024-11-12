@@ -33,22 +33,24 @@ public class PathFinderVisualization {
     private int screenHeight = 800;
     private int settingsPanelWidth = 200;
     private int gridPanelWidth = screenWidth-settingsPanelWidth-1;
-    private int gridSize = 10;
+    private int gridSize = 4;
 
-    private int[] defaultStartNode = {0,1}; 
-    private int[] defaultEndNode = {4,3}; 
     private JLabel statusLabel = new JLabel();
 
-    private GridGraph gridGraph = new GridGraph(gridSize, gridSize);
-    private JPanel gridPanel = new JPanel();
+    private GridGraph gridGraph;
+    private JPanel gridPanel;
 
     //HOLDS ALL THE COLORS USED
-    private Color settingsPanelBkg =  Color.BLUE;
-    private Color gridPanelBkg = Color.GRAY;
+    private Color gridPanelBkg = Color.white;
     private Color startNodeColor = Color.green;// new Color(0x000000);
-    private Color endNodeColor = Color.magenta;//new Color(0x000000);
+    private Color endNodeColor = Color.RED;//new Color(0x000000);
+    private Color pathColor = Color.PINK;
+    private Color visitedColor = Color.BLUE;
 
     PathFinderVisualization() {
+
+        gridGraph = new GridGraph(gridSize, gridSize);
+        gridPanel = new JPanel();
 
         JFrame frame = new JFrame("Path Finder Visualization");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -61,7 +63,7 @@ public class PathFinderVisualization {
         /*          ADD SETTINGS PANEL        */
         JPanel settingsPanel = new JPanel();
         settingsPanel.setLayout(new BoxLayout(settingsPanel, BoxLayout.Y_AXIS));
-        settingsPanel.setBackground(settingsPanelBkg);
+        //settingsPanel.setBackground(settingsPanelBkg);
         settingsPanel.setPreferredSize(new Dimension(settingsPanelWidth, screenHeight));
 
         
@@ -73,56 +75,18 @@ public class PathFinderVisualization {
         algorithmsPanel.setMaximumSize(new Dimension(settingsPanelWidth, 200));
         algorithmsPanel.setLayout(new FlowLayout());
         algorithmsPanel.add(new JLabel("Algorithm Options:"));
-        String[] algorithms = {"A*", "Dijkstra", "BFS", "DFS"};
+        String[] algorithms = {"BFS", "DFS"};
 
         JList<String> algorithmList = new JList<>(algorithms);
         algorithmList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION); // For single selection
-        algorithmList.setSelectedIndex(0); // Default selection: "A*"
+        algorithmList.setSelectedIndex(0); // Default selection to first element
 
         JScrollPane scrollPane = new JScrollPane(algorithmList);
         scrollPane.setPreferredSize(new Dimension(180, 160));
         algorithmsPanel.add(scrollPane);
 
-        algorithmsPanel.setBackground(Color.CYAN);
 
-
-
-
-        // TIME TOOK FOR ALGORITHM
-        JPanel timeTookPanel = new JPanel();
-        timeTookPanel.add(new JLabel("Time Took (ms)"));
-        timeTookPanel.setLayout(new FlowLayout());
-
-        JPanel timeVariable = new JPanel();
-        float timeTook = 0;
-        timeVariable.add(new JLabel(timeTook+" ms"));
-        timeTookPanel.add(timeVariable);
-        timeTookPanel.setMaximumSize(new Dimension(settingsPanelWidth, 50));
-
-
-
-        /*
-        WILL NEED TO CONFIGURE THIS, NOW THAT GRID CELL WORKS WITH ONCLICK, 
-
-        SETTINGS PANEL NEEDS HAVE OPTIONS ONLY FOR
-        ALGORITHM PICKED
-        SPEED OF VISUALIZATION
-        CLEAR BOARD
-        RUN, PAUSE ALGORITHM
-
-
-        FOR START AND TARGET NODES
-        WE WILL HAVE DEFAULT CELLS ALREADY SELECTED 
-
-        START COORD/TARGET COORD:
-        KEEP THE SAME INPUT AND BUTTON LAYOUT,
-        EXCEPTS ITS PREFILLED WITH DEFAULT COORD
-        USER CAN CHANGE ITS COORD BY CHANGING THE INPUT
-
-        (MIGHT SEE IF USER CAN DRAG THE CELL, MIGHT BE TOO MUCH FOR NOW)
-
-         */
-        // START NODE
+        /*  START NODE ****************************************************** */
         JPanel startNodePanel = new JPanel();
         startNodePanel.setLayout(new FlowLayout());
         startNodePanel.add(new JLabel("Start Coordinates"));
@@ -133,21 +97,24 @@ public class PathFinderVisualization {
         startNodeIcon.setSize(30, 30);
         startNodePanel.add(startNodeIcon);
 
-        JPanel startNodeIput = new JPanel();
-        startNodeIput.setSize(new Dimension(settingsPanelWidth-10, 20));
+        JPanel startNodeInput = new JPanel();
+        startNodeInput.setSize(new Dimension(settingsPanelWidth-10, 20));
+        startNodeInput.setBackground(Color.white);
         JTextField StartXCoord = new JTextField(5); // 5 columns wide
+        StartXCoord.setText("0");
         JTextField StartYCoord = new JTextField(5);
+        StartYCoord.setText("0");
 
         // START NODE INPUT
-        startNodeIput.add(new JLabel("["));
-        startNodeIput.add(StartXCoord);
-        startNodeIput.add(new JLabel(","));
-        startNodeIput.add(StartYCoord);
-        startNodeIput.add(new JLabel("]"));
+        startNodeInput.add(new JLabel("["));
+        startNodeInput.add(StartXCoord);
+        startNodeInput.add(new JLabel(","));
+        startNodeInput.add(StartYCoord);
+        startNodeInput.add(new JLabel("]"));
 
         startNodePanel.setMaximumSize(new Dimension(settingsPanelWidth, 100));
-        startNodePanel.setBackground(Color.CYAN);
-        startNodePanel.add(startNodeIput);
+        startNodePanel.setBackground(Color.white);
+        startNodePanel.add(startNodeInput);
 
         // set start node button
         JButton confirmStartNode = new JButton();
@@ -171,9 +138,10 @@ public class PathFinderVisualization {
 
 
 
-        // END NODE
+        /*  END NODE ****************************************************** */
         JPanel endNodePanel = new JPanel();
         endNodePanel.setLayout(new FlowLayout());
+        endNodePanel.setBackground(Color.white);
         endNodePanel.add(new JLabel("Target Coordinates"));
 
         //LITTLE ICON TO SHOW ITS COLOR
@@ -184,8 +152,12 @@ public class PathFinderVisualization {
 
         JPanel endNodeInput = new JPanel();
         endNodeInput.setSize(new Dimension(settingsPanelWidth-10, 20));
+        endNodeInput.setBackground(Color.white);
+
         JTextField EndXCoord = new JTextField(5); // 5 columns wide
+        EndXCoord.setText(gridSize-1+"");
         JTextField EndYCoord = new JTextField(5);
+        EndYCoord.setText(gridSize-1+"");
 
         // END NODE INPUT 
         endNodeInput.add(new JLabel("["));
@@ -225,46 +197,34 @@ public class PathFinderVisualization {
 
 
         // run button
-        JButton runButton = new JButton("Run");
+        JButton runButton = new JButton("Run Algorithm");
         // when run button is clicked run the selected algorithm 
         runButton.addActionListener(l -> {
+            ResetGrid();
             String selectedAlgorithm = algorithmList.getSelectedValue();
             statusLabel.setText("Running "+selectedAlgorithm+" Algorithm...");
             runAlgorithm(selectedAlgorithm);
         });
 
-        // pause button
-        JButton pauseButton = new JButton("Pause");
-        // when pause button is clicked
-        pauseButton.addActionListener(l -> {
-            System.out.println("Pause button clicked");
-        });
         
         //reset the grid
-        JButton resetButton = new JButton("Reset");
+        JButton resetButton = new JButton("Clear Path");
         // when reset button is clicked
         resetButton.addActionListener(l -> {
-            System.out.println("Reset button clicked");
-            statusLabel.setText("Resetting board...");
-            gridPanel.removeAll();
-            gridPanel.repaint();
-            setGridBoard();
-            statusLabel.setText("Board has been reset");
+            ResetGrid();
         });
 
         // add buttons to panel
-        actionButtons.setBackground(Color.CYAN);
         actionButtons.add(runButton);
-        actionButtons.add(pauseButton);
         actionButtons.add(resetButton);
 
 
 
         // INFORMATION LABEL 
         JPanel informationTextPanel = new JPanel();
-        informationTextPanel.setLayout(new BorderLayout());
+        informationTextPanel.setLayout(new BorderLayout(0, 100));
         
-        statusLabel.setText("Selected Algorithm... A*");
+        statusLabel.setText("Selected Algorithm... BFS");
         informationTextPanel.setMaximumSize(new Dimension(settingsPanelWidth, 100));
 
         statusLabel.setHorizontalAlignment(SwingConstants.LEFT);
@@ -291,9 +251,7 @@ public class PathFinderVisualization {
         settingsPanel.add(endNodePanel);
         settingsPanel.add(Box.createVerticalStrut(20));
         settingsPanel.add(actionButtons);
-        settingsPanel.add(Box.createVerticalStrut(20));
-        settingsPanel.add(timeTookPanel);
-        settingsPanel.add(Box.createVerticalStrut(20));
+        settingsPanel.add(Box.createVerticalStrut(100));
         settingsPanel.add(informationTextPanel);
 
         
@@ -301,11 +259,6 @@ public class PathFinderVisualization {
         
         /**********************************************************************************************************************/
         /*          ADD GRID PANEL        */
-        gridGraph.printGrid();
-        gridGraph.setStartNode(defaultStartNode[0], defaultStartNode[1]);
-        gridGraph.setEndNode(defaultEndNode[0], defaultEndNode[1]);
-
-
         // Add squares to the grid panel
         setGridBoard(); 
         
@@ -329,6 +282,12 @@ public class PathFinderVisualization {
         gridPanel.setPreferredSize(new Dimension(gridPanelWidth, screenHeight));
         gridPanel.setLayout(new GridLayout(gridSize, gridSize,0,0)); // 10x10 grid
 
+        Node startNode = gridGraph.getStartNode();
+        Node endNode = gridGraph.getEndNode();
+
+        System.out.println("Start node :: "+startNode.toString());
+        System.out.println("End node :: "+endNode.toString());
+
         for (int i = 0; i < gridSize*gridSize; ++i) {
             JPanel cell = new JPanel();
 
@@ -339,18 +298,13 @@ public class PathFinderVisualization {
             int[] coordinates = getRelativeCoordinates(i, gridSize); 
             cell.add(new JLabel(coordinates[0]+","+coordinates[1]), BorderLayout.NORTH);
 
-
-
             Node currentNode = gridGraph.getNode(coordinates[0], coordinates[1]);
-            if(currentNode.isStartNode()){
-                System.out.println("Start node to jpanel "+gridGraph.getStartNode().toString());
+            if(currentNode.equals(startNode)){
                 cell.setBackground(startNodeColor);
             }
-            if(currentNode.isEndNode()){
-                System.out.println("End node to panel "+gridGraph.getEndNode().toString());
+            else if(currentNode.equals(endNode)){
                 cell.setBackground(endNodeColor);
             }
-
 
             cell.setBorder(BorderFactory.createLineBorder(Color.BLACK)); // Add border to distinguish cells
             cell.setPreferredSize(new Dimension(10, 10));
@@ -372,23 +326,7 @@ public class PathFinderVisualization {
                 int[] coordinates = getRelativeCoordinates(cellIndex, gridSize);
                 System.out.println("Cell "+coordinates[0]+","+coordinates[1]);
 
-
-                gridPanel.getComponent(cellIndex).setBackground(Color.GREEN);
-
-                /*
-                //GETTING THE CELLS AROUND THE CELL
-                //BUG: X+-1 OR Y+-1 COULD BE OUT OF RANGE
-                Component cellLeft = getComponentAt(coordinates[0], coordinates[1]-1, gridPanel, gridSize);
-                Component cellRight = getComponentAt(coordinates[0], coordinates[1]+1, gridPanel, gridSize);
-                Component cellUp = getComponentAt(coordinates[0]+1, coordinates[1], gridPanel, gridSize);
-                Component cellDown = getComponentAt(coordinates[0]-1, coordinates[1], gridPanel, gridSize);
-
-                cellLeft.setBackground(Color.RED);
-                cellRight.setBackground(Color.RED);
-                cellUp.setBackground(Color.RED);
-                cellDown.setBackground(Color.RED);
-                 */
-
+                gridPanel.getComponent(cellIndex).setBackground(Color.GRAY);
             }
         };
     }
@@ -398,6 +336,15 @@ public class PathFinderVisualization {
         int index = (x * gridSize) + y;
 
         return gridPanel.getComponent(index);
+    }
+
+    private void ResetGrid(){
+        System.out.println("Reset button clicked");
+        statusLabel.setText("Resetting board...");
+        gridPanel.removeAll();
+        gridPanel.repaint();
+        setGridBoard();
+        statusLabel.setText("Board has been reset");
     }
 
 
@@ -410,6 +357,7 @@ public class PathFinderVisualization {
         }
         else if(algorithm.equals("DFS")){
             System.out.println("Running DFS");
+            startDFS();
         }
 
         
@@ -443,40 +391,6 @@ public class PathFinderVisualization {
         return new int[]{row, col}; 
     }
 
-
-    private void runAStarAlgorithm(){
-        //RUN A* ALGORITHM
-        Node startNode = gridGraph.getStartNode();
-        Node endNode = gridGraph.getEndNode();
-
-        startNode.neighbors.forEach(neighbor -> {
-            System.out.println(neighbor.toString());
-
-            try {
-                Component cell = getComponentAt(neighbor.row, neighbor.col);
-                Thread.sleep(500); // 500 milliseconds delay
-                cell.setBackground(Color.RED);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-
-        });
-
-        
-        endNode.neighbors.forEach(neighbor -> {
-            System.out.println(neighbor.toString());
-
-            try {
-                Component cell = getComponentAt(neighbor.row, neighbor.col);
-                Thread.sleep(500); // 500 milliseconds delay
-                cell.setBackground(Color.gray);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        });
-
-    }
-
     private void startBFS() {
         Queue<Node> queue = new LinkedList<>();
         boolean[][] visited = new boolean[gridSize][gridSize];
@@ -505,12 +419,50 @@ public class PathFinderVisualization {
                     Component cell = getComponentAt(neighbor.row, neighbor.col);
 
                     try { 
-                        cell.setBackground(Color.BLUE);
+                        cell.setBackground(visitedColor);
                         Thread.sleep(100); 
                     } catch (InterruptedException e) { 
                         e.printStackTrace(); 
                     }
 
+                }
+            }
+        }
+    }
+
+    private void startDFS() {
+        Stack<Node> stack = new Stack<>();
+        boolean[][] visited = new boolean[gridSize][gridSize];
+        Node[][] previous = new Node[gridSize][gridSize];
+        
+        Node startNode = gridGraph.getStartNode();
+        Node endNode = gridGraph.getEndNode();
+        stack.push(startNode);
+        visited[startNode.col][startNode.row] = true;
+
+        while (!stack.isEmpty()) {
+            Node current = stack.pop();
+            
+            if (current.equals(endNode)) {
+                reconstructPath(previous);
+                return;
+            }
+
+            for (Node neighbor : current.neighbors) {
+                if (!visited[neighbor.col][neighbor.row]) {
+                    visited[neighbor.col][neighbor.row] = true;
+                    previous[neighbor.col][neighbor.row] = current;
+                    stack.push(neighbor);
+
+                    // Color the cell to visualize DFS in progress
+                    Component cell = getComponentAt(neighbor.row, neighbor.col);
+
+                    try { 
+                        cell.setBackground(visitedColor); // Change to your preferred color
+                        Thread.sleep(100); 
+                    } catch (InterruptedException e) { 
+                        e.printStackTrace(); 
+                    }
                 }
             }
         }
@@ -523,10 +475,12 @@ public class PathFinderVisualization {
         Node step = endNode;
         while (step != null && !step.equals(startNode)) {
             Component cell = getComponentAt(step.row, step.col);
-            cell.setBackground(Color.PINK);
+            cell.setBackground(pathColor);
             step = previous[step.col][step.row];
         }
-    }
 
+        Component endCell = getComponentAt(endNode.row, endNode.col);
+        endCell.setBackground(endNodeColor);
+    }
 
 }

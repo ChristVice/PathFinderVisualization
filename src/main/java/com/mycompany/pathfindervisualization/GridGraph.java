@@ -4,8 +4,8 @@ public class GridGraph {
     private Node[][] grid;
     private int numRows, numCols;
 
-    private Node startNodeHolder = new Node(0, 0, true, true, false);
-    private Node endNodeHolder = new Node(numRows, numCols, true, false, true);
+    private Node startNode;
+    private Node endNode;
 
     public GridGraph(int numRows, int numCols) {
         this.numRows = numRows;
@@ -13,6 +13,11 @@ public class GridGraph {
 
         grid = new Node[numRows][numCols];
         initializeGrid();
+
+        //set start and end nodes
+        startNode = grid[0][0];
+        endNode = grid[numRows-1][numCols-1];
+        
         connectNodes();
     }
 
@@ -20,7 +25,7 @@ public class GridGraph {
     private void initializeGrid() {
         for (int row = 0; row < numRows; row++) {
             for (int col = 0; col < numCols; col++) {
-                grid[row][col] = new Node(row, col, true, false, false); // Assume all nodes are passable initially
+                grid[row][col] = new Node(row, col, true); // Assume all nodes are passable initially
             }
         }
     }
@@ -46,26 +51,20 @@ public class GridGraph {
     }
 
     public Node getStartNode() {
-        return startNodeHolder;
+        return startNode;
     }
 
     public Node getEndNode() {
-        return endNodeHolder;
+        return endNode;
     }
 
 
-    // POTENTIAL LOGIC ERRO OF NOT BEING ABLE TO CHANGE START NODE AFTER FIRST TIME
     public void setStartNode(int row, int col) {
-        Node startNode = grid[row][col];
-        startNode.isStartNode = true;
-        startNodeHolder = startNode;
+        startNode = grid[row][col];
     }
 
-    // POTENTIAL LOGIC ERRO OF NOT BEING ABLE TO CHANGE END NODE AFTER FIRST TIME
     public void setEndNode(int row, int col) {
-        Node endNode = grid[row][col];
-        endNode.isEndNode = true;
-        endNodeHolder = endNode;
+        endNode = grid[row][col];
     }
 
     // Print the grid and neighbors (for debugging)
