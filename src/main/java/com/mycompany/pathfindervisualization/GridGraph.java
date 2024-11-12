@@ -4,14 +4,13 @@ public class GridGraph {
     private Node[][] grid;
     private int numRows, numCols;
 
-    private boolean isStartNodeAlreadySet = false;
-    private Node startNodeHolder;
-    private boolean isEndNodeAlreadySet = false;
-    private Node endNodeHolder;
+    private Node startNodeHolder = new Node(0, 0, true, true, false);
+    private Node endNodeHolder = new Node(numRows, numCols, true, false, true);
 
     public GridGraph(int numRows, int numCols) {
         this.numRows = numRows;
         this.numCols = numCols;
+
         grid = new Node[numRows][numCols];
         initializeGrid();
         connectNodes();
@@ -47,56 +46,26 @@ public class GridGraph {
     }
 
     public Node getStartNode() {
-        for (int row = 0; row < numRows; row++) {
-            for (int col = 0; col < numCols; col++) {
-                Node node = grid[row][col];
-                if (node.isStartNode) {
-                    return node;
-                }
-            }
-        }
-        return null;
+        return startNodeHolder;
     }
 
     public Node getEndNode() {
-        for (int row = 0; row < numRows; row++) {
-            for (int col = 0; col < numCols; col++) {
-                Node node = grid[row][col];
-                if (node.isEndNode) {
-                    return node;
-                }
-            }
-        }
-        return null;
+        return endNodeHolder;
     }
 
 
     // POTENTIAL LOGIC ERRO OF NOT BEING ABLE TO CHANGE START NODE AFTER FIRST TIME
     public void setStartNode(int row, int col) {
-        if(!isStartNodeAlreadySet){
-            Node startNode = grid[row][col];
-            startNode.isStartNode = true;
-            startNodeHolder = startNode;
-            isStartNodeAlreadySet = true;
-        }
-        else{
-            System.out.println("Start node has already been set at :: "+startNodeHolder.toString());
-        }
-
-
+        Node startNode = grid[row][col];
+        startNode.isStartNode = true;
+        startNodeHolder = startNode;
     }
 
     // POTENTIAL LOGIC ERRO OF NOT BEING ABLE TO CHANGE END NODE AFTER FIRST TIME
     public void setEndNode(int row, int col) {
-        if(!isEndNodeAlreadySet){
-            Node endNode = grid[row][col];
-            endNode.isEndNode = true;
-            endNodeHolder = endNode;
-            isEndNodeAlreadySet = true;
-        }
-        else{
-            System.out.println("End node has already been set at :: "+endNodeHolder.toString());
-        }
+        Node endNode = grid[row][col];
+        endNode.isEndNode = true;
+        endNodeHolder = endNode;
     }
 
     // Print the grid and neighbors (for debugging)
