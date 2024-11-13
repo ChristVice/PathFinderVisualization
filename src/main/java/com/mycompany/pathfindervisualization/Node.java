@@ -22,10 +22,6 @@ public class Node {
         neighbors.add(neighbor);
     }
 
-    public int[] getCoordinates(){
-        return new int[]{row, col};
-    }
-
     // Override toString for easy debugging
     @Override
     public String toString() {

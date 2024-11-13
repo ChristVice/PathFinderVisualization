@@ -1,5 +1,7 @@
 package com.mycompany.pathfindervisualization;
 
+import java.util.Random;
+
 public class GridGraph {
     private Node[][] grid;
     private int numRows, numCols;
@@ -17,6 +19,27 @@ public class GridGraph {
         //set start and end nodes
         startNode = grid[0][0];
         endNode = grid[numRows-1][numCols-1];
+
+        Random random = new Random();
+        int startRow = random.nextInt(numRows);
+        int startCol = random.nextInt(numCols);
+        startNode = grid[startRow][startCol];
+
+        //startNode = grid[1][4];
+
+        int endRow, endCol;
+        do {
+            endRow = random.nextInt(numRows);
+            endCol = random.nextInt(numCols);
+
+            //                                      (y1-y2) + (x1-x2) >= 
+            boolean areNodesFarApart = Math.abs(startRow - endRow) + Math.abs(startCol - endCol) >= (numRows + numCols) / 2;
+            if(endRow != startRow && endCol != startCol && areNodesFarApart) {
+                break;
+            }
+
+        } while (true);//startRow == endRow && startCol == endCol || Math.abs(startRow - endRow) + Math.abs(startCol - endCol) < (numRows + numCols) / 2);
+        endNode = grid[endRow][endCol];
         
         connectNodes();
     }
@@ -38,9 +61,9 @@ public class GridGraph {
 
                 // Check the four possible directions (up, down, left, right)
                 if (row > 0) current.addNeighbor(grid[row - 1][col]); // Up
+                if (col < numCols - 1) current.addNeighbor(grid[row][col + 1]); // Right
                 if (row < numRows - 1) current.addNeighbor(grid[row + 1][col]); // Down
                 if (col > 0) current.addNeighbor(grid[row][col - 1]); // Left
-                if (col < numCols - 1) current.addNeighbor(grid[row][col + 1]); // Right
             }
         }
     }
@@ -57,7 +80,6 @@ public class GridGraph {
     public Node getEndNode() {
         return endNode;
     }
-
 
     public void setStartNode(int row, int col) {
         startNode = grid[row][col];
