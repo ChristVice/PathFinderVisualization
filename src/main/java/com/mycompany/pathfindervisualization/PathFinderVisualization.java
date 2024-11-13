@@ -32,11 +32,11 @@ import javax.swing.Timer;
 public class PathFinderVisualization {
 
 
-    private int screenWidth = 1300;
-    private int screenHeight = 800;
+    private final int screenWidth = 1300;
+    private final int screenHeight = 800;
     private int settingsPanelWidth = 200;
     private int gridPanelWidth = screenWidth-settingsPanelWidth-1;
-    private int gridSize = 10;
+    private final int gridSize = 10;
 
     private JLabel statusLabel = new JLabel();
 
@@ -45,11 +45,11 @@ public class PathFinderVisualization {
     private JPanel gridPanel;
 
     //HOLDS ALL THE COLORS USED
-    private Color gridPanelBkg = Color.white;
-    private Color startNodeColor = Color.green;// new Color(0x000000);
-    private Color endNodeColor = Color.RED;//new Color(0x000000);
-    private Color pathColor = Color.PINK;
-    private Color visitedColor = Color.BLUE;
+    private final Color gridPanelBkg = Color.WHITE;
+    private final Color startNodeColor = Color.GREEN;// new Color(0x000000);
+    private final Color endNodeColor = Color.RED;//new Color(0x000000);
+    private final Color pathColor = Color.PINK;
+    private final Color visitedColor = Color.BLUE;
 
     PathFinderVisualization() {
 
@@ -80,7 +80,7 @@ public class PathFinderVisualization {
 
         JList<String> algorithmList = new JList<>(algorithms);
         algorithmList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION); // For single selection
-        algorithmList.setSelectedIndex(1); // Default selection to first element
+        algorithmList.setSelectedIndex(0); // Default selection to first element
 
         JScrollPane scrollPane = new JScrollPane(algorithmList);
         scrollPane.setPreferredSize(new Dimension(180, 160));
@@ -128,11 +128,20 @@ public class PathFinderVisualization {
                 int x = Integer.parseInt(StartXCoord.getText().trim());
                 int y = Integer.parseInt(StartYCoord.getText().trim());
 
+                if (x >= gridSize || y >= gridSize) {
+                    throw new IllegalArgumentException("Start coordinates must be within the grid size.");
+                }
+
                 setStartNodeJPanel(x, y);
+
             }
             catch(NumberFormatException e){
                 JOptionPane.showMessageDialog(null, "Invalid number(s) set for start coordinates", "Error", JOptionPane.ERROR_MESSAGE);
                 System.out.println("Not valid number inputted");
+            }
+            catch(IllegalArgumentException e){
+                JOptionPane.showMessageDialog(null, e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+                System.out.println(e.getMessage());
             }
 
         });
@@ -184,12 +193,19 @@ public class PathFinderVisualization {
                 int x = Integer.parseInt(EndXCoord.getText().trim());
                 int y = Integer.parseInt(EndYCoord.getText().trim());
 
-                setEndNodeJPanel(x, y);
+                if (x >= gridSize || y >= gridSize) {
+                    throw new IllegalArgumentException("End coordinates must be within the grid size.");
+                }
 
+                setEndNodeJPanel(x, y);
             }
             catch(NumberFormatException e){
                 JOptionPane.showMessageDialog(null, "Invalid number(s) set for target coordinates", "Error", JOptionPane.ERROR_MESSAGE);
                 System.out.println("Not valid number inputted");
+            }
+            catch(IllegalArgumentException e){
+                JOptionPane.showMessageDialog(null, e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+                System.out.println(e.getMessage());
             }
 
         });
@@ -362,30 +378,27 @@ public class PathFinderVisualization {
             System.out.println("Running DFS");
             startDFSRecursive();
         }
-
         
     }
 
     private void setStartNodeJPanel(int x, int y){
+
         Component currentStartNodeCell = getComponentAt(gridGraph.getStartNode().row, gridGraph.getStartNode().col);
         currentStartNodeCell.setBackground(Color.WHITE);
-
+    
         gridGraph.setStartNode(x, y);
         currentStartNodeCell = getComponentAt(gridGraph.getStartNode().row, gridGraph.getStartNode().col);
         currentStartNodeCell.setBackground(startNodeColor);
-
-        System.out.println("Start Node coordinate :: "+x+", "+y);
     }
-
+    
     private void setEndNodeJPanel(int x, int y){
+    
         Component currentEndNodeCell = getComponentAt(gridGraph.getEndNode().row, gridGraph.getEndNode().col);
         currentEndNodeCell.setBackground(Color.WHITE);
-
+    
         gridGraph.setEndNode(x, y);
         currentEndNodeCell = getComponentAt(gridGraph.getEndNode().row, gridGraph.getEndNode().col);
         currentEndNodeCell.setBackground(endNodeColor);
-
-        //System.out.println("End Node coordinate :: "+x+", "+y);
     }
 
     private int[] getRelativeCoordinates(int cellIndex, int gridSize){
