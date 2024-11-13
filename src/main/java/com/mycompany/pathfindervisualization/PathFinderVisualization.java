@@ -31,18 +31,17 @@ import javax.swing.Timer;
 
 public class PathFinderVisualization {
 
-
     private final int screenWidth = 1300;
     private final int screenHeight = 800;
-    private int settingsPanelWidth = 200;
-    private int gridPanelWidth = screenWidth-settingsPanelWidth-1;
+    private final int settingsPanelWidth = 200;
+    private final int gridPanelWidth = screenWidth-settingsPanelWidth-1;
     private final int gridSize = 10;
 
     private JLabel statusLabel = new JLabel();
 
-    private JFrame frame;
-    private GridGraph gridGraph;
-    private JPanel gridPanel;
+    private final JFrame frame;
+    private final GridGraph gridGraph;
+    private final JPanel gridPanel;
 
     //HOLDS ALL THE COLORS USED
     private final Color gridPanelBkg = Color.WHITE;
@@ -542,9 +541,10 @@ public class PathFinderVisualization {
             @Override
             public void actionPerformed(ActionEvent e) {
                 if (pathIndex >= 1) {
-                    Node pathNode = pathSteps.get(pathIndex--);
+                    Node pathNode = pathSteps.get(pathIndex);
                     Component cell = getComponentAt(pathNode.row, pathNode.col);
                     cell.setBackground(pathColor);
+		    pathIndex--;
                 } else {
                     ((Timer) e.getSource()).stop();
                     
