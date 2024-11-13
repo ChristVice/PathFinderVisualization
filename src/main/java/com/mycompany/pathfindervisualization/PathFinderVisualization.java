@@ -67,7 +67,6 @@ public class PathFinderVisualization {
         /*          ADD SETTINGS PANEL        */
         JPanel settingsPanel = new JPanel();
         settingsPanel.setLayout(new BoxLayout(settingsPanel, BoxLayout.Y_AXIS));
-        //settingsPanel.setBackground(settingsPanelBkg);
         settingsPanel.setPreferredSize(new Dimension(settingsPanelWidth, screenHeight));
 
         
@@ -81,7 +80,7 @@ public class PathFinderVisualization {
 
         JList<String> algorithmList = new JList<>(algorithms);
         algorithmList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION); // For single selection
-        algorithmList.setSelectedIndex(0); // Default selection to first element
+        algorithmList.setSelectedIndex(1); // Default selection to first element
 
         JScrollPane scrollPane = new JScrollPane(algorithmList);
         scrollPane.setPreferredSize(new Dimension(180, 160));
@@ -452,48 +451,62 @@ public class PathFinderVisualization {
 
     }
 
-    private boolean startDFSRecursive() {
+    private void startDFSRecursive() {
         boolean[][] visited = new boolean[gridSize][gridSize];
         Node[][] previous = new Node[gridSize][gridSize];
+        List<Node> dfsSteps = new LinkedList<>();
 
         Node startNode = gridGraph.getStartNode();
         Node endNode = gridGraph.getEndNode();
 
-        if (dfsRecursive(startNode, endNode, visited, previous)) {
-            reconstructPath(previous);
-            return true;
+        if (dfsRecursive(startNode, endNode, visited, previous, dfsSteps)) {
+
+            Timer timer = new Timer(100, new ActionListener() {
+                int stepIndex = 0;
+
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    if (stepIndex < dfsSteps.size()) {
+                        Node stepNode = dfsSteps.get(stepIndex++);
+                        Component cell = getComponentAt(stepNode.row, stepNode.col);
+
+                        // Color start node separately if needed
+                        if (stepNode.equals(gridGraph.getStartNode())) {
+                            cell.setBackground(startNodeColor);
+                        } else {
+                            cell.setBackground(visitedColor);
+                        }
+                    } else {
+                        ((Timer) e.getSource()).stop();
+                        reconstructPath(previous); // Reconstruct the path once DFS animation is done
+                    }
+                }
+            });
+            timer.start();
         }
-        return false;
     }
 
-    private boolean dfsRecursive(Node current, Node endNode, boolean[][] visited, Node[][] previous) {
-        // Base case: if the current node is the end node, return true
+    private boolean dfsRecursive(Node current, Node endNode, boolean[][] visited, Node[][] previous, List<Node> dfsSteps) {
+
+        // Mark the current node as visited and color it
+        visited[current.col][current.row] = true;
+        dfsSteps.add(current);
+
         if (current.equals(endNode)) {
             return true;
         }
 
-        // Mark the current node as visited and color it
-        visited[current.col][current.row] = true;
-        Component cell = getComponentAt(current.row, current.col);
-        cell.setBackground(visitedColor); // Change to your preferred color for DFS
-
-        // Delay for visualization
-
         // Recursively visit each neighbor
         for (Node neighbor : current.neighbors) {
             if (!visited[neighbor.col][neighbor.row]) {
-                // Keep track of the path
                 previous[neighbor.col][neighbor.row] = current;
 
-                // If a path is found, return true
-                if (dfsRecursive(neighbor, endNode, visited, previous)) {
+                if (dfsRecursive(neighbor, endNode, visited, previous, dfsSteps)) {
                     return true;
                 }
             }
         }
 
-        // Optional: backtrack coloring to show cells being unvisited in DFS
-        //cell.setBackground(pathColor); // Change color if you want to show backtracking
         return false;
     }
 
