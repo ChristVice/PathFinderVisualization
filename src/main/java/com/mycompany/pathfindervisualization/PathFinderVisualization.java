@@ -1,7 +1,7 @@
 package com.mycompany.pathfindervisualization;
 
 import java.util.*;
-
+import java.util.function.Consumer;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
@@ -123,31 +123,16 @@ public class PathFinderVisualization {
             ResetGrid();
             statusLabel.setText("Starting coordinates set");
 
-            try{
+            if(isValidCoordinates(StartXCoord, StartYCoord)){
                 int x = Integer.parseInt(StartXCoord.getText().trim());
                 int y = Integer.parseInt(StartYCoord.getText().trim());
 
-                if (x >= gridSize || y >= gridSize) {
-                    throw new IllegalArgumentException("Start coordinates must be within the grid size.");
-                }
-
                 setStartNodeJPanel(x, y);
+            }
 
-            }
-            catch(NumberFormatException e){
-                JOptionPane.showMessageDialog(null, "Invalid number(s) set for start coordinates", "Error", JOptionPane.ERROR_MESSAGE);
-                System.out.println("Not valid number inputted");
-            }
-            catch(IllegalArgumentException e){
-                JOptionPane.showMessageDialog(null, e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-                System.out.println(e.getMessage());
-            }
 
         });
         startNodePanel.add(confirmStartNode);
-
-
-
 
 
         /*  END NODE ****************************************************** */
@@ -188,29 +173,15 @@ public class PathFinderVisualization {
             ResetGrid();
             statusLabel.setText("Target coordinates set");
 
-            try{
+            if(isValidCoordinates(EndXCoord, EndYCoord)){
                 int x = Integer.parseInt(EndXCoord.getText().trim());
                 int y = Integer.parseInt(EndYCoord.getText().trim());
 
-                if (x >= gridSize || y >= gridSize) {
-                    throw new IllegalArgumentException("End coordinates must be within the grid size.");
-                }
-
                 setEndNodeJPanel(x, y);
-            }
-            catch(NumberFormatException e){
-                JOptionPane.showMessageDialog(null, "Invalid number(s) set for target coordinates", "Error", JOptionPane.ERROR_MESSAGE);
-                System.out.println("Not valid number inputted");
-            }
-            catch(IllegalArgumentException e){
-                JOptionPane.showMessageDialog(null, e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-                System.out.println(e.getMessage());
             }
 
         });
         endNodePanel.add(confirmEndNode);
-
-
 
 
         /*  ACTION BUTTONS (RUN, PAUSE, RESET) ****************************************************** */
@@ -242,7 +213,6 @@ public class PathFinderVisualization {
         actionButtons.add(resetButton);
 
 
-
         //          INFORMATION LABEL 
         JPanel informationTextPanel = new JPanel();
         informationTextPanel.setLayout(new BorderLayout(0, 100));
@@ -262,9 +232,6 @@ public class PathFinderVisualization {
                 }
             }
         });
-
-
-
 
         /*      ADD COMPONENTS TO SETTINGS PANEL     */
         settingsPanel.add(algorithmsPanel);
@@ -292,6 +259,27 @@ public class PathFinderVisualization {
 
     }
 
+    private boolean isValidCoordinates(JTextField xCoordField, JTextField yCoordField) {
+        try {
+            int x = Integer.parseInt(xCoordField.getText().trim());
+            int y = Integer.parseInt(yCoordField.getText().trim());
+
+            if (x >= gridSize || y >= gridSize) {
+                throw new IllegalArgumentException("Coordinates must be within the grid size.");
+            }
+
+            return true;
+
+        } catch (NumberFormatException e) {
+            JOptionPane.showMessageDialog(null, "Invalid number(s) entered for coordinates", "Error", JOptionPane.ERROR_MESSAGE);
+            System.out.println("Not valid number inputted");
+            return false;
+        } catch (IllegalArgumentException e) {
+            JOptionPane.showMessageDialog(null, e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            System.out.println(e.getMessage());
+            return false;
+        }
+    }
 
     public void setGridBoard(){
         gridPanel.setBackground(gridPanelBkg);
@@ -302,7 +290,7 @@ public class PathFinderVisualization {
         Node endNode = gridGraph.getEndNode();
 
         //start filling the grid with panels, each with coordinates, color start and end nodes, then add to gridPanel
-        for (int i = 0; i < gridSize*gridSize; ++i) {
+        for(int i = 0; i < gridSize*gridSize; ++i) {
             JPanel cell = new JPanel();
 
             cell.setLayout(new BorderLayout());
@@ -323,31 +311,10 @@ public class PathFinderVisualization {
             cell.setBorder(BorderFactory.createLineBorder(Color.BLACK)); // Add border to distinguish cells
             cell.setPreferredSize(new Dimension(10, 10));
 
-            // when user clicks on cell
-            //cell.addMouseListener(createMouseAdapter(i, gridPanel, gridSize, gridGraph));
-
             gridPanel.add(cell); // Add cell to the grid
         }
 
     }
-
-
-    // Extracted method to handle mouse click on a cell
-    /*
-    private MouseAdapter createMouseAdapter(int cellIndex, JPanel gridPanel, int gridSize, GridGraph gridGraph) {
-        return new MouseAdapter() {
-            @Override
-            public void mouseClicked(MouseEvent e) {
-                int[] coordinates = getRelativeCoordinates(cellIndex, gridSize);
-                System.out.println("Cell "+coordinates[0]+","+coordinates[1]);
-
-                gridPanel.getComponent(cellIndex).setBackground(Color.GRAY);
-
-                statusLabel.setText("Cell "+coordinates[0]+","+coordinates[1]+" clicked");
-            }
-        };
-    }
-     */
 
     // Method to get the component at (x, y) in the grid
     private Component getComponentAt(int x, int y) {
@@ -432,7 +399,7 @@ public class PathFinderVisualization {
                 break;
             }
             
-            for (Node neighbor : current.neighbors) {
+            for(Node neighbor : current.neighbors) {
                 if (!visited[neighbor.col][neighbor.row]) {
                     visited[neighbor.col][neighbor.row] = true;
                     previous[neighbor.col][neighbor.row] = current;
@@ -509,7 +476,7 @@ public class PathFinderVisualization {
         }
 
         // Recursively visit each neighbor
-        for (Node neighbor : current.neighbors) {
+        for(Node neighbor : current.neighbors) {
             if (!visited[neighbor.col][neighbor.row]) {
                 previous[neighbor.col][neighbor.row] = current;
 

@@ -17,15 +17,10 @@ public class GridGraph {
         initializeGrid();
 
         //set start and end nodes
-        startNode = grid[0][0];
-        endNode = grid[numRows-1][numCols-1];
-
         Random random = new Random();
         int startRow = random.nextInt(numRows);
         int startCol = random.nextInt(numCols);
         startNode = grid[startRow][startCol];
-
-        //startNode = grid[1][4];
 
         int endRow, endCol;
         do {
@@ -38,7 +33,7 @@ public class GridGraph {
                 break;
             }
 
-        } while (true);//startRow == endRow && startCol == endCol || Math.abs(startRow - endRow) + Math.abs(startCol - endCol) < (numRows + numCols) / 2);
+        } while (true);
         endNode = grid[endRow][endCol];
         
         connectNodes();
@@ -48,7 +43,7 @@ public class GridGraph {
     private void initializeGrid() {
         for (int row = 0; row < numRows; row++) {
             for (int col = 0; col < numCols; col++) {
-                grid[row][col] = new Node(row, col, true); // Assume all nodes are passable initially
+                grid[row][col] = new Node(row, col); // Assume all nodes are passable initially
             }
         }
     }

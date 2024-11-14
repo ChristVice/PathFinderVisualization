@@ -5,14 +5,12 @@ import java.util.List;
 
 public class Node {
     public int row, col;
-    public boolean isPassable;
     public List<Node> neighbors;
 
     // Constructor
-    public Node(int row, int col, boolean isPassable) {
+    public Node(int row, int col) {
         this.row = row;
         this.col = col;
-        this.isPassable = isPassable;
 
         this.neighbors = new ArrayList<>();
     }
