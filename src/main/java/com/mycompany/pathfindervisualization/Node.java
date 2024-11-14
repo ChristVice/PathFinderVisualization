@@ -4,9 +4,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Node {
-    int row, col;
-    boolean isPassable;
-    List<Node> neighbors;
+    public int row, col;
+    public boolean isPassable;
+    public List<Node> neighbors;
 
     // Constructor
     public Node(int row, int col, boolean isPassable) {
