@@ -28,7 +28,7 @@ public class GridGraph {
             endCol = random.nextInt(numCols);
 
             //                                      (y1-y2) + (x1-x2) >= 
-            boolean areNodesFarApart = Math.abs(startRow - endRow) + Math.abs(startCol - endCol) >= (numRows + numCols) / 2;
+            boolean areNodesFarApart = Math.abs(startRow - endRow) + Math.abs(startCol - endCol) >= ((numRows + numCols) / 2)-10;
             if(endRow != startRow && endCol != startCol && areNodesFarApart) {
                 break;
             }
@@ -43,7 +43,7 @@ public class GridGraph {
     private void initializeGrid() {
         for (int row = 0; row < numRows; row++) {
             for (int col = 0; col < numCols; col++) {
-                grid[row][col] = new Node(row, col); // Assume all nodes are passable initially
+                grid[row][col] = new Node(row, col, true); // Assume all nodes are passable initially
             }
         }
     }
@@ -76,12 +76,22 @@ public class GridGraph {
         return endNode;
     }
 
+    public boolean getIsPassable(int row, int col) {
+        return grid[row][col].isPassable;
+    }
+
     public void setStartNode(int row, int col) {
         startNode = grid[row][col];
+        startNode.isPassable = true;
     }
 
     public void setEndNode(int row, int col) {
         endNode = grid[row][col];
+        endNode.isPassable = true;
+    }
+
+    public void setIsPassable(int row, int col, boolean isPassable) {
+        grid[row][col].isPassable = isPassable;
     }
 
     // Print the grid and neighbors (for debugging)
