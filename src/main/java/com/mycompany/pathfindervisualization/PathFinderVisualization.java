@@ -34,9 +34,10 @@ public class PathFinderVisualization {
     private final int screenHeight = 800;
     private final int settingsPanelWidth = 200;
     private final int gridPanelWidth = screenWidth-settingsPanelWidth-1;
-    private final int gridSize = 25;
     private final int visitedTimerMilliSec = 50;
     private final int pathTimerMilliSec = 50;
+
+    private final int gridSize = 15;
 
     private final JFrame frame;
     private final GridGraph gridGraph;
@@ -196,7 +197,7 @@ public class PathFinderVisualization {
         JPanel actionButtons = new JPanel();
         actionButtons.setLayout(new FlowLayout(FlowLayout.CENTER, 10, 10));
         actionButtons.setBackground(settingsPanelColor);
-        actionButtons.setMaximumSize(new Dimension(settingsPanelWidth, 100));
+        actionButtons.setMaximumSize(new Dimension(settingsPanelWidth, 150));
 
 
         //          RUN BUTTON 
@@ -233,7 +234,7 @@ public class PathFinderVisualization {
 
         //          INFORMATION LABEL 
         JPanel informationTextPanel = new JPanel();
-        informationTextPanel.setLayout(new BorderLayout(0, 100));
+        informationTextPanel.setLayout(new BorderLayout(10, 100));
         informationTextPanel.setBackground(settingsPanelColor);
         
         statusLabel.setText("Selected Algorithm... BFS");
@@ -259,9 +260,9 @@ public class PathFinderVisualization {
         settingsPanel.add(startNodePanel);
         settingsPanel.add(Box.createVerticalStrut(20));
         settingsPanel.add(endNodePanel);
-        settingsPanel.add(Box.createVerticalStrut(20));
+        settingsPanel.add(Box.createVerticalStrut(10));
         settingsPanel.add(actionButtons);
-        settingsPanel.add(Box.createVerticalStrut(100));
+        settingsPanel.add(Box.createVerticalStrut(60));
         settingsPanel.add(informationTextPanel);
 
         
