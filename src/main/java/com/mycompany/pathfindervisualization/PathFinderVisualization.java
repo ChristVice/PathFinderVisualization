@@ -37,7 +37,7 @@ public class PathFinderVisualization {
     private final int visitedTimerMilliSec = 50;
     private final int pathTimerMilliSec = 50;
 
-    private final int gridSize = 15;
+    private final int gridSize = 5;
 
     private final JFrame frame;
     private final GridGraph gridGraph;
@@ -56,11 +56,15 @@ public class PathFinderVisualization {
     private ArrayList<Integer> obstacleCells = new ArrayList<Integer>();
     private JLabel statusLabel = new JLabel();
 
+    private List<Node> pathSteps = new LinkedList<>();
+    private List<Node> foundPathSteps = new LinkedList<>();
+
 
     PathFinderVisualization() {
 
         gridGraph = new GridGraph(gridSize, gridSize);
         gridPanel = new JPanel();
+        
 
         frame = new JFrame("Path Finder Visualization");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -129,7 +133,7 @@ public class PathFinderVisualization {
         JButton confirmStartNode = new JButton();
         confirmStartNode.add(new JLabel("Set Start Coordinates"));
         confirmStartNode.addActionListener(l -> {
-            ResetGrid();
+            ResetColoredCells();
             statusLabel.setText("Starting coordinates set");
 
             if(isValidCoordinates(StartXCoord, StartYCoord)){
@@ -179,7 +183,7 @@ public class PathFinderVisualization {
         JButton confirmEndNode = new JButton();
         confirmEndNode.add(new JLabel("Set Target Coordinates"));
         confirmEndNode.addActionListener(l -> {
-            ResetGrid();
+            ResetColoredCells();
             statusLabel.setText("Target coordinates set");
 
             if(isValidCoordinates(EndXCoord, EndYCoord)){
@@ -201,21 +205,21 @@ public class PathFinderVisualization {
 
 
         //          RUN BUTTON 
-        JButton runButton = new JButton("Run Algorithm");
+        JButton runAlgorithmButton = new JButton("Run Algorithm");
         // when run button is clicked run the selected algorithm 
-        runButton.addActionListener(l -> {
-            ResetGrid();
+        runAlgorithmButton.addActionListener(l -> {
+            ResetColoredCells();
             String selectedAlgorithm = algorithmList.getSelectedValue();
             statusLabel.setText("Running "+selectedAlgorithm+" Algorithm...");
             runAlgorithm(selectedAlgorithm);
         });
 
         
-        //          RESET BUTTON 
-        JButton resetButton = new JButton("Clear Path");
+        //          CLEAR PATH BUTTON 
+        JButton clearPathButton = new JButton("Clear Path");
         // when reset button is clicked
-        resetButton.addActionListener(l -> {
-            ResetGrid();
+        clearPathButton.addActionListener(l -> {
+            ResetColoredCells();
         });
 
 
@@ -227,8 +231,8 @@ public class PathFinderVisualization {
         });
 
         // add buttons to panel
-        actionButtons.add(runButton);
-        actionButtons.add(resetButton);
+        actionButtons.add(runAlgorithmButton);
+        actionButtons.add(clearPathButton);
         actionButtons.add(clearWallsButton);
 
 
@@ -386,23 +390,39 @@ public class PathFinderVisualization {
         return gridPanel.getComponent(index);
     }
 
-    private void ResetGrid(){
+    private void ResetColoredCells(){
         System.out.println("Reset button clicked");
-        statusLabel.setText("Resetting board...");
-        gridPanel.removeAll();
-        gridPanel.repaint();
-        setGridBoard();
+        statusLabel.setText("Resetting colored cells...");
+
+        for(Node node : pathSteps){
+            if(!node.equals(gridGraph.getStartNode()) && !node.equals(gridGraph.getEndNode())){
+                Component cell = getComponentAt(node.row, node.col);
+                cell.setBackground(Color.WHITE);
+            }
+        }
+        for(Node node : foundPathSteps){
+            if(!node.equals(gridGraph.getStartNode()) && !node.equals(gridGraph.getEndNode())){
+                Component cell = getComponentAt(node.row, node.col);
+                cell.setBackground(Color.WHITE);
+            }
+        }
+        pathSteps.clear();
+        foundPathSteps.clear(); 
+
         statusLabel.setText("Board has been reset");
+
     }
 
     private void ClearWalls(){
         System.out.println("Clear walls button clicked");
         statusLabel.setText("Clearing walls...");
+
         for(int i : obstacleCells){
             int[] coords = getRelativeCoordinates(i, gridSize);
             gridGraph.setIsPassable(coords[0], coords[1], true);
             gridPanel.getComponent(i).setBackground(Color.WHITE);
         }
+
         obstacleCells.clear();
         statusLabel.setText("Walls have been cleared");
     }
@@ -410,21 +430,23 @@ public class PathFinderVisualization {
 
     // Static method to run the selected algorithm
     private void runAlgorithm(String algorithm) {
+        PathFindingAlgorithms pathfindingAlgorithms = new PathFindingAlgorithms(gridGraph, gridSize);
+
         // Run the selected algorithm
-        for(int i : obstacleCells){
-            int[] coords = getRelativeCoordinates(i, gridSize);
-            System.out.println("Obstacle at "+coords[0]+","+coords[1]);
-        }
-
-
         if(algorithm.equals("BFS")){
             System.out.println("Running BFS");
-            startBFS();
+            pathfindingAlgorithms.RunChosenAlgorithm(0);
         }
         else if(algorithm.equals("DFS")){
             System.out.println("Running DFS");
-            startDFSRecursive();
+            pathfindingAlgorithms.RunChosenAlgorithm(1);
         }
+
+        this.pathSteps = pathfindingAlgorithms.getPathSteps();
+        this.foundPathSteps = pathfindingAlgorithms.getFoundPathSteps();
+
+        System.out.println(foundPathSteps);
+        Animater(pathSteps, foundPathSteps);
         
     }
 
@@ -452,60 +474,30 @@ public class PathFinderVisualization {
     private int[] getRelativeCoordinates(int cellIndex, int gridSize){
         int row = cellIndex / gridSize;
         int col = cellIndex % gridSize;
-        return new int[]{row, col}; 
+        return new int[]{row, col};
     }
 
-    private void startBFS() {
-        Queue<Node> queue = new LinkedList<>();
-        boolean[][] visited = new boolean[gridSize][gridSize];
-        Node[][] previous = new Node[gridSize][gridSize];
-
-        List<Node> bfsSteps = new LinkedList<>();
-
-        Node startNode = gridGraph.getStartNode();
-        Node endNode = gridGraph.getEndNode();
-        queue.add(startNode);
-        visited[startNode.col][startNode.row] = true;
-
-        while (!queue.isEmpty()) {
-            Node current = queue.poll();
-            
-            if (current.equals(endNode)) {
-
-                //remove all the steps after the last step from bsfSteps
-                int bfsStepsSize = bfsSteps.size()-1;
-                for(int i=bfsStepsSize; i>bfsStepsSize-queue.size()+1; i--){
-                    bfsSteps.remove(i);
-                }
-                
-                break;
-
-            }
-            
-            for(Node neighbor : current.neighbors) {
-                if (!visited[neighbor.col][neighbor.row] && neighbor.isPassable) {
-                    visited[neighbor.col][neighbor.row] = true;
-                    previous[neighbor.col][neighbor.row] = current;
-                    queue.add(neighbor);
-
-                    bfsSteps.add(neighbor);
-                }
-            }
-        }
+    /**
+     * Animates the pathfinding steps on the visualization grid.
+     *
+     * @param pathSteps The list of nodes representing the path steps.
+     * @param previous A 2D array of nodes representing the previous nodes in the path.
+     */
+    private void Animater(List<Node> pathSteps, List<Node> foundPath){
 
         Timer timer = new Timer(visitedTimerMilliSec, new ActionListener() {
             int stepIndex = 0;
 
             @Override
             public void actionPerformed(ActionEvent e) {
-                if (stepIndex < bfsSteps.size()-1) { 
-                    Node stepNode = bfsSteps.get(stepIndex);
+                if (stepIndex < pathSteps.size()-1) { 
+                    Node stepNode = pathSteps.get(stepIndex);
                     Component cell = getComponentAt(stepNode.row, stepNode.col);
                     cell.setBackground(visitedColor);
                     stepIndex++;
                 } else {
                     ((Timer) e.getSource()).stop(); // Stop the timer after all steps are displayed
-                    reconstructPath(previous);
+                    reconstructPath(foundPath);
                 }
             }
         });
@@ -513,88 +505,21 @@ public class PathFinderVisualization {
 
     }
 
-    private void startDFSRecursive() {
-        boolean[][] visited = new boolean[gridSize][gridSize];
-        Node[][] previous = new Node[gridSize][gridSize];
-        List<Node> dfsSteps = new LinkedList<>();
-
+    private void reconstructPath(List<Node> foundPath){
         Node startNode = gridGraph.getStartNode();
         Node endNode = gridGraph.getEndNode();
 
-        if (dfsRecursive(startNode, endNode, visited, previous, dfsSteps)) {
-
-            Timer timer = new Timer(visitedTimerMilliSec, new ActionListener() {
-                int stepIndex = 0;
-
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    if (stepIndex < dfsSteps.size()) {
-                        Node stepNode = dfsSteps.get(stepIndex++);
-                        Component cell = getComponentAt(stepNode.row, stepNode.col);
-
-                        // Color start node separately if needed
-                        if (stepNode.equals(gridGraph.getStartNode())) {
-                            cell.setBackground(startNodeColor);
-                        } else {
-                            cell.setBackground(visitedColor);
-                        }
-                    } else {
-                        ((Timer) e.getSource()).stop();
-                        reconstructPath(previous); // Reconstruct the path once DFS animation is done
-                    }
-                }
-            });
-            timer.start();
-        }
-    }
-
-    private boolean dfsRecursive(Node current, Node endNode, boolean[][] visited, Node[][] previous, List<Node> dfsSteps) {
-
-        // Mark the current node as visited and color it
-        visited[current.col][current.row] = true;
-        dfsSteps.add(current);
-
-        if (current.equals(endNode)) {
-            return true;
-        }
-
-        // Recursively visit each neighbor
-        for(Node neighbor : current.neighbors) {
-            if (!visited[neighbor.col][neighbor.row] && neighbor.isPassable) {
-                previous[neighbor.col][neighbor.row] = current;
-
-                if (dfsRecursive(neighbor, endNode, visited, previous, dfsSteps)) {
-                    return true;
-                }
-            }
-        }
-
-        return false;
-    }
-
-
-    private void reconstructPath(Node[][] previous) {
-        Node startNode = gridGraph.getStartNode();
-        Node endNode = gridGraph.getEndNode();
-
-        List<Node> pathSteps = new LinkedList<>();
-        Node step = endNode;
-        while (step != null && !step.equals(startNode)) {
-            pathSteps.add(step);
-            step = previous[step.col][step.row];
-        }
-
-        // Start a Timer to animate the coloring of each cell in the path
+        // Start a Timer to animate the coloring of each cell in the foundPathSteps list
         Timer timer = new Timer(pathTimerMilliSec, new ActionListener() {
-            int pathIndex = pathSteps.size() - 1;
+            int pathIndex = foundPath.size() - 1;
 
             @Override
             public void actionPerformed(ActionEvent e) {
                 if (pathIndex >= 1) {
-                    Node pathNode = pathSteps.get(pathIndex);
+                    Node pathNode = foundPath.get(pathIndex);
                     Component cell = getComponentAt(pathNode.row, pathNode.col);
                     cell.setBackground(pathColor);
-		    pathIndex--;
+                    pathIndex--;
                 } else {
                     ((Timer) e.getSource()).stop();
                     
