@@ -46,8 +46,8 @@ public class PathFindingAlgorithms {
      * @param algorithm The algorithm to run:
      *                  0 - Breadth-First Search (BFS)
      *                  1 - Depth-First Search (DFS)
-     *                  2 - A* Search (currently not implemented)
-     *                  3 - Dijkstra's algorithm (currently not implemented)
+     *                  2 - Dijkstra's algorithm (currently not implemented)
+     *                  3 - A* Search (currently not implemented)
      * 
      */
     public void RunChosenAlgorithm(int algorithm) {
@@ -62,13 +62,20 @@ public class PathFindingAlgorithms {
                 startDFSRecursive();
                 break;
             case 2:
-                //startAStar();
+                startDijkstrasAlgorithm();
                 break;
             default:
                 break;
         }
 
         return;
+    }
+
+    private void startDijkstrasAlgorithm(){
+
+
+
+
     }
 
     private void startBFS() {
@@ -85,14 +92,11 @@ public class PathFindingAlgorithms {
             Node current = queue.poll();
             
             if (current.equals(endNode)) {
-                //remove all the steps after the last step from bsfSteps
-                int pathStepsSize = pathSteps.size()-1;
-                for(int i=pathStepsSize; i>pathStepsSize-queue.size()+1; --i){
+                //remove all the steps after the last step from pathSteps
+                for(int i=0; i < queue.size(); ++i){
                     pathSteps.removeLast();
                 }
-                
                 break;
-
             }
             
             for(Node neighbor : current.neighbors) {
@@ -105,7 +109,6 @@ public class PathFindingAlgorithms {
                 }
             }
         }
-
 
         this.setFoundPathSteps(previous);
 

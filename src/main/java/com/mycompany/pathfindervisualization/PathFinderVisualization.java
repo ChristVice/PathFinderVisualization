@@ -34,10 +34,11 @@ public class PathFinderVisualization {
     private final int screenHeight = 800;
     private final int settingsPanelWidth = 200;
     private final int gridPanelWidth = screenWidth-settingsPanelWidth-1;
-    private final int visitedTimerMilliSec = 50;
-    private final int pathTimerMilliSec = 50;
 
-    private final int gridSize = 5;
+    private final int searchingTimerDelay = 50; // in ms
+    private final int foundPathTimerDelay = 60; //in ms
+
+    private final int gridSize = 10;
 
     private final JFrame frame;
     private final GridGraph gridGraph;
@@ -51,13 +52,14 @@ public class PathFinderVisualization {
     private final Color pathColor = Color.PINK;
     private final Color visitedColor = Color.BLUE;
     //private final Color obstacleColor = new Color(0xC9C9C9);
-    private final Color obstacleColor = new Color(0x000000);
+    private final Color obstacleColor = Color.BLACK;
     
-    private ArrayList<Integer> obstacleCells = new ArrayList<Integer>();
     private JLabel statusLabel = new JLabel();
 
+    private final String[] algorithms = {"BFS", "DFS", "Dijkstra's", "A*"};
     private List<Node> pathSteps = new LinkedList<>();
     private List<Node> foundPathSteps = new LinkedList<>();
+    private ArrayList<Integer> obstacleCells = new ArrayList<Integer>();
 
 
     PathFinderVisualization() {
@@ -88,7 +90,6 @@ public class PathFinderVisualization {
         algorithmsPanel.setBackground(settingsPanelColor);
         algorithmsPanel.setLayout(new FlowLayout());
         algorithmsPanel.add(new JLabel("Algorithm Options:"));
-        String[] algorithms = {"BFS", "DFS"};
 
         JList<String> algorithmList = new JList<>(algorithms);
         algorithmList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION); // For single selection
@@ -142,7 +143,6 @@ public class PathFinderVisualization {
 
                 setStartNodeJPanel(x, y);
             }
-
 
         });
         startNodePanel.add(confirmStartNode);
@@ -383,13 +383,6 @@ public class PathFinderVisualization {
 
     }
 
-    // Method to get the component at (x, y) in the grid
-    private Component getComponentAt(int x, int y) {
-        int index = (x * gridSize) + y;
-
-        return gridPanel.getComponent(index);
-    }
-
     private void ResetColoredCells(){
         System.out.println("Reset button clicked");
         statusLabel.setText("Resetting colored cells...");
@@ -432,38 +425,60 @@ public class PathFinderVisualization {
     private void runAlgorithm(String algorithm) {
         PathFindingAlgorithms pathfindingAlgorithms = new PathFindingAlgorithms(gridGraph, gridSize);
 
-        // Run the selected algorithm
-        if(algorithm.equals("BFS")){
-            System.out.println("Running BFS");
-            pathfindingAlgorithms.RunChosenAlgorithm(0);
-        }
-        else if(algorithm.equals("DFS")){
-            System.out.println("Running DFS");
-            pathfindingAlgorithms.RunChosenAlgorithm(1);
+        switch (algorithm) {
+            case "BFS":
+                System.out.println("Running BFS");
+                pathfindingAlgorithms.RunChosenAlgorithm(0);
+                break;
+
+            case "DFS":
+                System.out.println("Running DFS");
+                pathfindingAlgorithms.RunChosenAlgorithm(1);
+                break;  
+        
+            default:
+                break;
         }
 
         this.pathSteps = pathfindingAlgorithms.getPathSteps();
         this.foundPathSteps = pathfindingAlgorithms.getFoundPathSteps();
 
-        System.out.println(foundPathSteps);
-        Animater(pathSteps, foundPathSteps);
+        AnimateSearchPath();
         
     }
 
+    /**
+     * Sets the start node on the JPanel at the specified coordinates (x, y).
+     * This method updates the background color of the previous start node cell to white,
+     * sets the new start node in the grid graph, and updates the background color of the
+     * new start node cell to the designated start node color.
+     *
+     * @param x the x-coordinate of the new start node
+     * @param y the y-coordinate of the new start node
+     */
     private void setStartNodeJPanel(int x, int y){
+        Node startNode = gridGraph.getStartNode();
 
-        Component currentStartNodeCell = getComponentAt(gridGraph.getStartNode().row, gridGraph.getStartNode().col);
+        Component currentStartNodeCell = getComponentAt(startNode.row, startNode.col);
         currentStartNodeCell.setBackground(Color.WHITE);
     
         gridGraph.setStartNode(x, y);
-        currentStartNodeCell = getComponentAt(gridGraph.getStartNode().row, gridGraph.getStartNode().col);
         currentStartNodeCell = getComponentAt(x, y);
         currentStartNodeCell.setBackground(startNodeColor);
     }
     
+    /**
+     * Sets the end node in the grid graph to the specified coordinates (x, y).
+     * Updates the background color of the previous end node cell to white and
+     * sets the background color of the new end node cell to the designated end node color.
+     *
+     * @param x the x-coordinate (row) of the new end node
+     * @param y the y-coordinate (column) of the new end node
+     */
     private void setEndNodeJPanel(int x, int y){
+        Node endNode = gridGraph.getEndNode();
     
-        Component currentEndNodeCell = getComponentAt(gridGraph.getEndNode().row, gridGraph.getEndNode().col);
+        Component currentEndNodeCell = getComponentAt(endNode.row, endNode.col);
         currentEndNodeCell.setBackground(Color.WHITE);
     
         gridGraph.setEndNode(x, y);
@@ -471,33 +486,31 @@ public class PathFinderVisualization {
         currentEndNodeCell.setBackground(endNodeColor);
     }
 
-    private int[] getRelativeCoordinates(int cellIndex, int gridSize){
-        int row = cellIndex / gridSize;
-        int col = cellIndex % gridSize;
-        return new int[]{row, col};
-    }
 
     /**
      * Animates the pathfinding steps on the visualization grid.
-     *
-     * @param pathSteps The list of nodes representing the path steps.
-     * @param previous A 2D array of nodes representing the previous nodes in the path.
      */
-    private void Animater(List<Node> pathSteps, List<Node> foundPath){
+    private void AnimateSearchPath(){
+        Node startNode = gridGraph.getStartNode();
 
-        Timer timer = new Timer(visitedTimerMilliSec, new ActionListener() {
+        Timer timer = new Timer(searchingTimerDelay, new ActionListener() {
             int stepIndex = 0;
 
             @Override
             public void actionPerformed(ActionEvent e) {
                 if (stepIndex < pathSteps.size()-1) { 
                     Node stepNode = pathSteps.get(stepIndex);
-                    Component cell = getComponentAt(stepNode.row, stepNode.col);
-                    cell.setBackground(visitedColor);
+
+                    //in case path adds start node to its list
+                    if(!stepNode.equals(startNode)){
+                        Component cell = getComponentAt(stepNode.row, stepNode.col);
+                        cell.setBackground(visitedColor);
+                    }
+
                     stepIndex++;
                 } else {
                     ((Timer) e.getSource()).stop(); // Stop the timer after all steps are displayed
-                    reconstructPath(foundPath);
+                    AnimateFoundPath();
                 }
             }
         });
@@ -505,33 +518,59 @@ public class PathFinderVisualization {
 
     }
 
-    private void reconstructPath(List<Node> foundPath){
-        Node startNode = gridGraph.getStartNode();
-        Node endNode = gridGraph.getEndNode();
+    /**
+     * Animates the coloring of the found path on the grid.
+     * 
+     * This method uses a Timer to sequentially color each cell in the found path,
+     * starting from the end node and moving backwards to the start node. The end
+     * node is colored red at the end of the animation.
+     * 
+     */
+    private void AnimateFoundPath(){
 
         // Start a Timer to animate the coloring of each cell in the foundPathSteps list
-        Timer timer = new Timer(pathTimerMilliSec, new ActionListener() {
-            int pathIndex = foundPath.size() - 1;
+        Timer timer = new Timer(foundPathTimerDelay, new ActionListener() {
+            int pathIndex = foundPathSteps.size()-1;
 
             @Override
             public void actionPerformed(ActionEvent e) {
                 if (pathIndex >= 1) {
-                    Node pathNode = foundPath.get(pathIndex);
-                    Component cell = getComponentAt(pathNode.row, pathNode.col);
-                    cell.setBackground(pathColor);
+                    Node pathNode = foundPathSteps.get(pathIndex);
+                    getComponentAt(pathNode.row, pathNode.col).setBackground(pathColor);
                     pathIndex--;
                 } else {
                     ((Timer) e.getSource()).stop();
-                    
-                    Component endCell = getComponentAt(endNode.row, endNode.col);
-                    endCell.setBackground(endNodeColor);
                 }
             }
         });
         timer.start();
 
-        // color the end node red
-        getComponentAt(endNode.row, endNode.col).setBackground(endNodeColor);
+    }
+
+    /**
+     * Retrieves the component located at the specified grid coordinates.
+     *
+     * @param x the x-coordinate of the grid position
+     * @param y the y-coordinate of the grid position
+     * @return the component at the specified (x, y) position in the grid
+     */
+    private Component getComponentAt(int x, int y) {
+        int index = (x * gridSize) + y;
+
+        return gridPanel.getComponent(index);
+    }
+
+    /**
+     * Calculates the relative coordinates (row and column) of a cell in a grid.
+     *
+     * @param cellIndex the index of the cell in the grid
+     * @param gridSize the size of the grid (number of cells per row/column)
+     * @return an array containing the row and column of the cell, respectively
+     */
+    private int[] getRelativeCoordinates(int cellIndex, int gridSize){
+        int row = cellIndex / gridSize;
+        int col = cellIndex % gridSize;
+        return new int[]{row, col};
     }
 
 
