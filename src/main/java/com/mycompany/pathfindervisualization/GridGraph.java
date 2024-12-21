@@ -39,7 +39,10 @@ public class GridGraph {
         connectNodes();
     }
 
-    // Initialize the grid with nodes
+    /**
+     * Initializes the grid with nodes. Each node is created with its row and column
+     * indices and is initially set to be passable.
+     */
     private void initializeGrid() {
         for (int row = 0; row < numRows; row++) {
             for (int col = 0; col < numCols; col++) {
@@ -48,7 +51,12 @@ public class GridGraph {
         }
     }
 
-    // Connect adjacent nodes (up, down, left, right)
+    /**
+     * Connects each node in the grid to its adjacent nodes (up, down, left, right).
+     * This method iterates through each node in the grid and adds its neighboring nodes
+     * to its list of neighbors, establishing bidirectional connections between adjacent nodes.
+     * 
+     */
     private void connectNodes() {
         for (int row = 0; row < numRows; row++) {
             for (int col = 0; col < numCols; col++) {
@@ -80,6 +88,11 @@ public class GridGraph {
         return grid[row][col].isPassable;
     }
 
+    public int getNodeWeightBetweenNodes(Node A, Node B) {
+        System.out.println("Getting weight between " + A + " and " + B);
+        return grid[A.row][A.col].neighbors.stream().filter(neighbor -> neighbor.node.row == B.row && neighbor.node.col == B.col).findFirst().get().getWeight();
+    }
+
     public void setStartNode(int row, int col) {
         startNode = grid[row][col];
         startNode.isPassable = true;
@@ -94,14 +107,19 @@ public class GridGraph {
         grid[row][col].isPassable = isPassable;
     }
 
+    public void setNodeWeightBetweenNodes(Node A, Node B, int weight) {
+        System.out.println("Setting weight between " + A + " and " + B + " to " + weight);
+        grid[A.row][A.col].neighbors.stream().filter(neighbor -> neighbor.node.row == B.row && neighbor.node.col == B.col).findFirst().get().setWeight(weight);
+    }
+
     // Print the grid and neighbors (for debugging)
     public void printGrid() {
         for (int row = 0; row < numRows; row++) {
             for (int col = 0; col < numCols; col++) {
                 Node node = grid[row][col];
                 System.out.print("Node " + node + " has neighbors: ");
-                for (Node neighbor : node.neighbors) {
-                    System.out.print(neighbor + " ");
+                for (Node.Edge neighbor : node.neighbors) {
+                    System.out.print("-"+neighbor.weight+"->"+neighbor.node+" ");
                 }
                 System.out.println();
             }

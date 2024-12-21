@@ -38,7 +38,7 @@ public class PathFinderVisualization {
     private final int searchingTimerDelay = 50; // in ms
     private final int foundPathTimerDelay = 60; //in ms
 
-    private final int gridSize = 10;
+    private final int gridSize = 15;
 
     private final JFrame frame;
     private final GridGraph gridGraph;
@@ -66,7 +66,6 @@ public class PathFinderVisualization {
 
         gridGraph = new GridGraph(gridSize, gridSize);
         gridPanel = new JPanel();
-        
 
         frame = new JFrame("Path Finder Visualization");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -434,6 +433,11 @@ public class PathFinderVisualization {
             case "DFS":
                 System.out.println("Running DFS");
                 pathfindingAlgorithms.RunChosenAlgorithm(1);
+                break;  
+
+            case "Dijkstra's":
+                System.out.println("Running Dijkstra's");
+                pathfindingAlgorithms.RunChosenAlgorithm(2);
                 break;  
         
             default:

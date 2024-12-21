@@ -6,7 +6,10 @@ import java.util.List;
 public class Node {
     public int row, col;
     public boolean isPassable;
-    public List<Node> neighbors;
+    public List<Edge> neighbors;
+    public int distance = 1;
+
+    private int edgeWeight = 1;
 
     // Constructor
     public Node(int row, int col, boolean isPassable) {
@@ -19,7 +22,25 @@ public class Node {
 
     // Add a neighboring node
     public void addNeighbor(Node neighbor) {
-        neighbors.add(neighbor);
+        neighbors.add(new Edge(neighbor, edgeWeight));
+    }
+
+    static class Edge{
+        Node node;
+        int weight;
+
+        public Edge(Node node, int weight) {
+            this.node = node;
+            this.weight = weight;
+        }
+
+        public void setWeight(int weight) {
+            this.weight = weight;
+        }
+
+        public int getWeight() {
+            return weight;
+        }
     }
 
     // Override toString for easy debugging
@@ -27,5 +48,6 @@ public class Node {
     public String toString() {
         return "(" + row + ", " + col + ")";
     }
+
     
 }

@@ -1,10 +1,9 @@
 package com.mycompany.pathfindervisualization;
 
 import java.util.List;
+import java.util.PriorityQueue;
 import java.util.Queue;
-
-import javax.swing.Timer;
-
+import java.util.Comparator;
 import java.util.LinkedList;
 
 public class PathFindingAlgorithms {
@@ -68,14 +67,60 @@ public class PathFindingAlgorithms {
                 break;
         }
 
+        System.out.println("pathSteps: " + pathSteps);
+        System.out.println("foundSteps: " + foundPathSteps);
+
         return;
     }
 
-    private void startDijkstrasAlgorithm(){
+    /*
+     * 
+     * 
+     */
+    private void startDijkstrasAlgorithm() {
+        PriorityQueue<Node> pq = new PriorityQueue<>(gridSize * gridSize, new Comparator<Node>() {
+            @Override
+            public int compare(Node node1, Node node2) {
+                return Integer.compare(node1.distance, node2.distance);
+            }
+        });
+
+        boolean[][] visited = new boolean[gridSize][gridSize];
+        Node[][] previous = new Node[gridSize][gridSize];
+
+        Node startNode = grid.getStartNode();
+        Node endNode = grid.getEndNode();
+
+        startNode.distance = 0;
+        pq.add(startNode);
+
+        while (!pq.isEmpty()) {
+            Node current = pq.poll();
+
+            if (current.equals(endNode)) {
+                System.out.println("pq" + pq);
+                System.out.println("path" + pathSteps);
+                break;
+            }
+
+            for(Node.Edge adjacent : current.neighbors) {
+                Node neighbor = adjacent.node;
+                int newDistance = current.distance + adjacent.weight;
+
+                if (!visited[neighbor.col][neighbor.row] && neighbor.isPassable && newDistance < neighbor.distance) {
+                    visited[current.col][current.row] = true;
+
+                    neighbor.distance = newDistance;
+                    previous[neighbor.col][neighbor.row] = current;
+                    pq.add(neighbor);
+
+                    pathSteps.add(neighbor);
+                }
+            }
+        }
 
 
-
-
+        this.setFoundPathSteps(previous);
     }
 
     private void startBFS() {
@@ -99,7 +144,9 @@ public class PathFindingAlgorithms {
                 break;
             }
             
-            for(Node neighbor : current.neighbors) {
+            for(Node.Edge adjacent : current.neighbors) {
+                Node neighbor = adjacent.node;
+
                 if (!visited[neighbor.col][neighbor.row] && neighbor.isPassable) {
                     visited[neighbor.col][neighbor.row] = true;
                     previous[neighbor.col][neighbor.row] = current;
@@ -138,7 +185,10 @@ public class PathFindingAlgorithms {
         }
 
         // Recursively visit each neighbor
-        for(Node neighbor : current.neighbors) {
+
+        for(Node.Edge adjacent : current.neighbors) {
+            Node neighbor = adjacent.node;
+            
             if (!visited[neighbor.col][neighbor.row] && neighbor.isPassable) {
                 previous[neighbor.col][neighbor.row] = current;
 
