@@ -72,6 +72,7 @@ public class PathFindingAlgorithms {
                 startGreedyBestFirstAlgorithm();
                 break;
             case 5:
+                startBidirectionalSearchAlgorithm();
                 break;
             default:
                 break;
@@ -92,6 +93,11 @@ public class PathFindingAlgorithms {
         System.out.println("foundSteps: " + foundPathSteps);
 
         return;
+    }
+
+    private void startBidirectionalSearchAlgorithm(){
+        return ;
+
     }
 
 
