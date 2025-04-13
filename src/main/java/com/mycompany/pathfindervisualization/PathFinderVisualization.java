@@ -38,7 +38,7 @@ public class PathFinderVisualization {
     private final int searchingTimerDelay = 50; // in ms
     private final int foundPathTimerDelay = 60; //in ms
 
-    private final int gridSize = 15;
+    private final int gridSize = 10;
 
     private final JFrame frame;
     private final GridGraph gridGraph;
@@ -56,7 +56,7 @@ public class PathFinderVisualization {
     
     private JLabel statusLabel = new JLabel();
 
-    private final String[] algorithms = {"BFS", "DFS", "Dijkstra's", "A*"};
+    private final String[] algorithms = {"BFS", "DFS", "Dijkstra's", "A*", "Greedy Best-First Search", "Bidirectional Search"};
     private List<Node> pathSteps = new LinkedList<>();
     private List<Node> foundPathSteps = new LinkedList<>();
     private ArrayList<Integer> obstacleCells = new ArrayList<Integer>();
@@ -439,6 +439,21 @@ public class PathFinderVisualization {
                 System.out.println("Running Dijkstra's");
                 pathfindingAlgorithms.RunChosenAlgorithm(2);
                 break;  
+
+            case "A*":
+                System.out.println("Running A*");
+                pathfindingAlgorithms.RunChosenAlgorithm(3);
+                break;  
+
+            case "Greedy Best-First Search":
+                System.out.println("Running Greedy Best-First Search");
+                pathfindingAlgorithms.RunChosenAlgorithm(4);
+                break;  
+
+            case "Bidirectional Search":
+                System.out.println("Running Bidirectional Search");
+                pathfindingAlgorithms.RunChosenAlgorithm(5);
+                break;  
         
             default:
                 break;
@@ -514,6 +529,9 @@ public class PathFinderVisualization {
                     stepIndex++;
                 } else {
                     ((Timer) e.getSource()).stop(); // Stop the timer after all steps are displayed
+                    Component cell = getComponentAt(gridGraph.getEndNode().row, gridGraph.getEndNode().col);
+                    cell.setBackground(endNodeColor);
+
                     AnimateFoundPath();
                 }
             }

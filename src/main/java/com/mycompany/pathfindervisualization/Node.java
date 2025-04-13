@@ -7,7 +7,7 @@ public class Node {
     public int row, col;
     public boolean isPassable;
     public List<Edge> neighbors;
-    public int distance = 1;
+    public int distance = Integer.MAX_VALUE; 
 
     private int edgeWeight = 1;
 
