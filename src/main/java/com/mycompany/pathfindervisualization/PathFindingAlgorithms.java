@@ -3,7 +3,6 @@ package com.mycompany.pathfindervisualization;
 import java.util.List;
 import java.util.PriorityQueue;
 import java.util.Queue;
-import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -51,29 +50,36 @@ public class PathFindingAlgorithms {
      *                  3 - A* Search (currently not implemented)
      * 
      */
-    public void RunChosenAlgorithm(int algorithm) {
+    public void RunChosenAlgorithm(String algorithm) {
         pathSteps.clear();
         foundPathSteps.clear();
 
         switch (algorithm) {
-            case 0:
+
+            case "BFS":
                 startBFS();
                 break;
-            case 1:
+
+            case "DFS":
                 startDFSRecursive();
-                break;
-            case 2:
+                break;  
+
+            case "Dijkstra's":
                 startDijkstrasAlgorithm();
-                break;
-            case 3:
+                break;  
+
+            case "A*":
                 startAStarAlgorithm();
-                break;
-            case 4:
+                break;  
+
+            case "Greedy Best-First Search":
                 startGreedyBestFirstAlgorithm();
-                break;
-            case 5:
+                break;  
+
+            case "Bidirectional Search":
                 startBidirectionalSearchAlgorithm();
-                break;
+                break;  
+        
             default:
                 break;
         }

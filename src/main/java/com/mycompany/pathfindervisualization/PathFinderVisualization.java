@@ -424,46 +424,11 @@ public class PathFinderVisualization {
     private void runAlgorithm(String algorithm) {
         PathFindingAlgorithms pathfindingAlgorithms = new PathFindingAlgorithms(gridGraph, gridSize);
 
-        switch (algorithm) {
-            case "BFS":
-                System.out.println("Running BFS");
-                pathfindingAlgorithms.RunChosenAlgorithm(0);
-                break;
+        System.out.println("Running "+algorithm);
+        pathfindingAlgorithms.RunChosenAlgorithm(algorithm);
 
-            case "DFS":
-                System.out.println("Running DFS");
-                pathfindingAlgorithms.RunChosenAlgorithm(1);
-                break;  
-
-            case "Dijkstra's":
-                System.out.println("Running Dijkstra's");
-                pathfindingAlgorithms.RunChosenAlgorithm(2);
-                break;  
-
-            case "A*":
-                System.out.println("Running A*");
-                pathfindingAlgorithms.RunChosenAlgorithm(3);
-                break;  
-
-            case "Greedy Best-First Search":
-                System.out.println("Running Greedy Best-First Search");
-                pathfindingAlgorithms.RunChosenAlgorithm(4);
-                break;  
-
-            case "Bidirectional Search":
-                System.out.println("Running Bidirectional Search");
-                pathfindingAlgorithms.RunChosenAlgorithm(5);
-                break;  
-        
-            default:
-                break;
-        }
-
-        this.pathSteps = pathfindingAlgorithms.getPathSteps();
-        this.foundPathSteps = pathfindingAlgorithms.getFoundPathSteps();
 
         AnimateSearchPath();
-        
     }
 
     /**
